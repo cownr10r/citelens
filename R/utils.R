@@ -32,3 +32,24 @@
   Encoding(lines) <- "UTF-8"
   lines
 }
+
+# Validate and normalise an Excel output path: a single string, "~" expanded,
+# ".xlsx" added if missing, and the folder must already exist.
+.xlsx_path <- function(xlsx) {
+  if (!is.character(xlsx) || length(xlsx) != 1 || is.na(xlsx) || !nzchar(xlsx)) {
+    stop("`xlsx` must be a single file path.", call. = FALSE)
+  }
+  xlsx <- path.expand(xlsx)
+  if (!grepl("\\.xlsx$", xlsx, ignore.case = TRUE)) xlsx <- paste0(xlsx, ".xlsx")
+  if (!dir.exists(dirname(xlsx))) {
+    stop("Folder does not exist: ", dirname(xlsx), call. = FALSE)
+  }
+  xlsx
+}
+
+# Write a data frame to a one-sheet Excel file (path already checked by .xlsx_path()).
+.write_xlsx_df <- function(df, xlsx) {
+  writexl::write_xlsx(df, xlsx)
+  message("Wrote ", nrow(df), " entr", if (nrow(df) == 1) "y" else "ies", " to ", xlsx)
+  invisible(xlsx)
+}

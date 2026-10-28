@@ -32,6 +32,8 @@
 #' @export
 bib_to_df <- function(input, clean = TRUE, xlsx = NULL) {
   if (!file.exists(input)) stop("File not found: ", input, call. = FALSE)
+  if (!is.null(xlsx)) xlsx <- .xlsx_path(xlsx)  # fail early on a bad path
+
   lines <- .read_text_lines(input)
   df <- bib_parse_cpp(lines, isTRUE(clean))
 
@@ -41,16 +43,7 @@ bib_to_df <- function(input, clean = TRUE, xlsx = NULL) {
   }
 
   if (!is.null(xlsx)) {
-    if (!is.character(xlsx) || length(xlsx) != 1 || is.na(xlsx) || !nzchar(xlsx)) {
-      stop("`xlsx` must be a single file path.", call. = FALSE)
-    }
-    xlsx <- path.expand(xlsx)
-    if (!grepl("\\.xlsx$", xlsx, ignore.case = TRUE)) xlsx <- paste0(xlsx, ".xlsx")
-    if (!dir.exists(dirname(xlsx))) {
-      stop("Folder does not exist: ", dirname(xlsx), call. = FALSE)
-    }
-    writexl::write_xlsx(df, xlsx)
-    message("Wrote ", nrow(df), " entr", if (nrow(df) == 1) "y" else "ies", " to ", xlsx)
+    .write_xlsx_df(df, xlsx)
     return(invisible(df))
   }
 

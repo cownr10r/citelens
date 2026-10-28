@@ -3,5 +3,6 @@
 export(bib_to_df)
 export(convert_refworks)
 export(refworks_to_bib)
+export(refworks_to_xlsx)
 importFrom(Rcpp,sourceCpp)
 useDynLib(biblio, .registration = TRUE)

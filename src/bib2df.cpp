@@ -4,11 +4,15 @@
 
 #include <Rcpp.h>
 
+#include "ascii.h"
+
 #include <cctype>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
+
+using namespace biblio_ascii;
 
 namespace {
 
@@ -19,14 +23,14 @@ struct BibEntry {
 };
 
 std::string lower(std::string s) {
-    for (char& c : s) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    for (char& c : s) c = toLowerA(c);
     return s;
 }
 
 std::string trimStr(const std::string& s) {
     size_t b = 0, e = s.size();
-    while (b < e && std::isspace(static_cast<unsigned char>(s[b]))) ++b;
-    while (e > b && std::isspace(static_cast<unsigned char>(s[e - 1]))) --e;
+    while (b < e && isSpaceA(s[b])) ++b;
+    while (e > b && isSpaceA(s[e - 1])) --e;
     return s.substr(b, e - b);
 }
 
@@ -51,7 +55,7 @@ std::string cleanValue(const std::string& v) {
     std::string out;
     bool inSpace = false;
     for (char c : stripped) {
-        if (std::isspace(static_cast<unsigned char>(c))) {
+        if (isSpaceA(c)) {
             inSpace = true;
         } else {
             if (inSpace && !out.empty()) out += ' ';
@@ -80,7 +84,7 @@ class Parser {
             i_ = at + 1;
             skipWs();
             std::string type;
-            while (i_ < s_.size() && std::isalpha(static_cast<unsigned char>(s_[i_]))) type += s_[i_++];
+            while (i_ < s_.size() && isAlphaA(s_[i_])) type += s_[i_++];
             if (type.empty()) continue;
             type = lower(type);
             skipWs();
@@ -107,7 +111,7 @@ class Parser {
     bool eof() const { return i_ >= s_.size(); }
 
     void skipWs() {
-        while (!eof() && std::isspace(static_cast<unsigned char>(s_[i_]))) ++i_;
+        while (!eof() && isSpaceA(s_[i_])) ++i_;
     }
 
     // At '{' : returns the content without the outer braces and moves past the closing brace.
@@ -170,8 +174,8 @@ class Parser {
             } else {
                 std::string tok;
                 while (!eof()) {
-                    unsigned char ch = static_cast<unsigned char>(s_[i_]);
-                    if (std::isalnum(ch) || ch == '_' || ch == '-' || ch == ':' || ch == '.' ||
+                    char ch = s_[i_];
+                    if (isAlnumA(ch) || ch == '_' || ch == '-' || ch == ':' || ch == '.' ||
                         ch == '/' || ch == '+')
                         tok += s_[i_++];
                     else

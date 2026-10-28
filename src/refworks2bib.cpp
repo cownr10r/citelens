@@ -7,6 +7,8 @@
 
 #include <Rcpp.h>
 
+#include "ascii.h"
+
 #include <algorithm>
 #include <cctype>
 #include <initializer_list>
@@ -16,6 +18,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+using namespace biblio_ascii;
 
 namespace {
 
@@ -28,20 +32,20 @@ struct Record {
 
 std::string trim(const std::string& s) {
     size_t b = 0, e = s.size();
-    while (b < e && std::isspace(static_cast<unsigned char>(s[b]))) ++b;
-    while (e > b && std::isspace(static_cast<unsigned char>(s[e - 1]))) --e;
+    while (b < e && isSpaceA(s[b])) ++b;
+    while (e > b && isSpaceA(s[e - 1])) --e;
     return s.substr(b, e - b);
 }
 
 std::string toLower(std::string s) {
-    for (char& c : s) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    for (char& c : s) c = toLowerA(c);
     return s;
 }
 
 std::string alnumLower(const std::string& s) {
     std::string out;
-    for (unsigned char c : s)
-        if (std::isalnum(c)) out += static_cast<char>(std::tolower(c));
+    for (char c : asciiFold(s))
+        if (isAlnumA(c)) out += toLowerA(c);
     return out;
 }
 
@@ -149,8 +153,7 @@ std::vector<Record> parseRefWorks(const Rcpp::CharacterVector& lines) {
 // "XX  - value" -> tag "XX", value. Also accepts a bare "ER" line.
 bool parseRisLine(const std::string& line, std::string& tag, std::string& val) {
     if (line.size() < 2) return false;
-    if (!std::isupper(static_cast<unsigned char>(line[0])) ||
-        !std::isalnum(static_cast<unsigned char>(line[1])))
+    if (!isUpperA(line[0]) || !isAlnumA(line[1]))
         return false;
     size_t i = 2;
     while (i < line.size() && (line[i] == ' ' || line[i] == '\t')) ++i;
@@ -311,10 +314,7 @@ std::string cleanDoi(std::string d) {
 std::string yearOf(const Record& r) {
     std::string y = firstOf(r, {"YR", "FD"});
     for (size_t i = 0; i + 4 <= y.size(); ++i) {
-        if (std::isdigit(static_cast<unsigned char>(y[i])) &&
-            std::isdigit(static_cast<unsigned char>(y[i + 1])) &&
-            std::isdigit(static_cast<unsigned char>(y[i + 2])) &&
-            std::isdigit(static_cast<unsigned char>(y[i + 3])))
+        if (isDigitA(y[i]) && isDigitA(y[i + 1]) && isDigitA(y[i + 2]) && isDigitA(y[i + 3]))
             return y.substr(i, 4);
     }
     return y;
@@ -360,10 +360,10 @@ std::string makeKey(const Record& r, std::set<std::string>& used) {
     std::string word;
     {
         std::string cur;
-        std::string title = first(r, "T1") + " ";
-        for (unsigned char c : title) {
-            if (std::isalnum(c)) {
-                cur += static_cast<char>(std::tolower(c));
+        std::string title = asciiFold(first(r, "T1")) + " ";
+        for (char c : title) {
+            if (isAlnumA(c)) {
+                cur += toLowerA(c);
             } else if (!cur.empty()) {
                 if (!stop.count(cur)) {
                     word = cur;
