@@ -4,7 +4,7 @@
 \alias{bib_to_df}
 \title{Read a BibTeX (.bib) file into a data frame}
 \usage{
-bib_to_df(input, clean = TRUE)
+bib_to_df(input, clean = TRUE, xlsx = NULL)
 }
 \arguments{
 \item{input}{Path to the `.bib` (or `.txt`) file.}
@@ -14,9 +14,15 @@ bib_to_df(input, clean = TRUE)
 percent signs, dollar signs, hashes and underscores, and collapse line
 breaks and repeated spaces. Other LaTeX commands, such as accents, are left
 as they are. Use `FALSE` to get the raw values.}
+
+\item{xlsx}{Optional path for an Excel file (e.g. `"~/Desktop/refs.xlsx"`).
+If given, the data frame is also written there as a single sheet with a
+header row, and the data frame is returned invisibly. A missing `.xlsx`
+extension is added. An existing file at that path is overwritten.}
 }
 \value{
-A data frame with one row per BibTeX entry.
+A data frame with one row per BibTeX entry (invisibly when `xlsx`
+  is given).
 }
 \description{
 Parses a BibTeX file with compiled C++ code and returns one row per entry.
@@ -32,4 +38,8 @@ ignored.
 \examples{
 f <- system.file("extdata", "sample.bib", package = "biblio")
 bib_to_df(f)
+
+# Also save an Excel copy
+out <- tempfile(fileext = ".xlsx")
+bib_to_df(f, xlsx = out)
 }
