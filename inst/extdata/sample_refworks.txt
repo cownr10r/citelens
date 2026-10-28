@@ -1,0 +1,52 @@
+RT Journal Article
+SR Electronic(1)
+ID 1001
+A1 Tinto, Vincent
+T1 Research and practice of student retention: What next?
+JF Journal of College Student Retention: Research, Theory & Practice
+YR 2006
+VO 8
+IS 1
+SP 1
+OP 19
+K1 retention; persistence; higher education
+AB This article reviews the last forty years of research on student retention
+and argues that institutions should focus on the conditions that promote
+persistence in the classroom.
+DO https://doi.org/10.2190/4NWK-STAC-2PLH-PJ3D
+SN 1521-0251
+LK https://example.org/tinto2006
+RT Book, Whole
+ID 1002
+A1 Bailey, Thomas R.
+A1 Jaggars, Shanna Smith
+A1 Jenkins, Davis
+T1 Redesigning America's Community Colleges: A Clearer Path to Student Success
+YR 2015
+PB Harvard University Press
+PP Cambridge, MA
+SN 978-0-674-36835-5
+RT Book, Section
+ID 1003
+A1 Cabrera, Alberto F.
+A1 Nora, Amaury
+A2 Smart, John C.
+T1 College persistence & the "student integration" model
+T2 Higher Education: Handbook of Theory and Research
+YR 2012
+VO 27
+SP 100-145
+PB Springer
+PP Dordrecht
+RT Dissertation/Thesis
+ID 1004
+A1 Garcia, Maria L.
+T1 Dual credit participation and first-year college outcomes
+YR 2019
+PB University of Texas at San Antonio
+RT Journal Article
+ID 1005
+A1 Tinto, Vincent
+T1 Research and practice of student retention: What next?
+JF Journal of College Student Retention
+YR 2006 Jan

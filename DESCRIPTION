@@ -1,11 +1,14 @@
 Package: biblio
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
-Config/roxygen2/version: 8.1.1
+Type: Package
+Title: Convert RefWorks Citations to BibTeX
+Version: 0.1.0
+Authors@R: person("Mario", "Martinez", email = "mario.a.martinez@live.com", role = c("aut", "cre"))
+Description: Converts citations exported from RefWorks in Tagged Format into
+    BibTeX (.bib) entries. The conversion is implemented in C++ via Rcpp.
+License: MIT + file LICENSE
 Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
+Imports: Rcpp
+LinkingTo: Rcpp
+Suggests: testthat (>= 3.0.0)
+Config/testthat/edition: 3
+RoxygenNote: 7.3.2
