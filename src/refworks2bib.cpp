@@ -142,6 +142,117 @@ std::vector<Record> parseRefWorks(const Rcpp::CharacterVector& lines) {
     return records;
 }
 
+// ---------- RIS parsing ----------
+// RIS lines look like "TY  - JOUR" / "AU  - Tinto, Vincent" and records end with "ER  - ".
+// They are mapped onto the same internal tags the RefWorks Tagged parser uses.
+
+// "XX  - value" -> tag "XX", value. Also accepts a bare "ER" line.
+bool parseRisLine(const std::string& line, std::string& tag, std::string& val) {
+    if (line.size() < 2) return false;
+    if (!std::isupper(static_cast<unsigned char>(line[0])) ||
+        !std::isalnum(static_cast<unsigned char>(line[1])))
+        return false;
+    size_t i = 2;
+    while (i < line.size() && (line[i] == ' ' || line[i] == '\t')) ++i;
+    if (i < line.size() && line[i] == '-') {
+        tag = line.substr(0, 2);
+        val = trim(line.substr(i + 1));
+        return true;
+    }
+    if (i == line.size() && line.substr(0, 2) == "ER") {
+        tag = "ER";
+        val.clear();
+        return true;
+    }
+    return false;
+}
+
+bool looksLikeRis(const Rcpp::CharacterVector& lines) {
+    for (R_xlen_t i = 0; i < lines.size(); ++i) {
+        if (Rcpp::CharacterVector::is_na(lines[i])) continue;
+        std::string line = Rcpp::as<std::string>(lines[i]);
+        if (i == 0 && line.size() >= 3 && static_cast<unsigned char>(line[0]) == 0xEF)
+            line.erase(0, 3);
+        std::string tag, val;
+        if (parseRisLine(line, tag, val) && tag == "TY") return true;
+    }
+    return false;
+}
+
+std::string risTypeToRefWorks(const std::string& ty) {
+    std::string t = toLower(trim(ty));
+    if (t == "jour" || t == "jfull" || t == "ejour") return "Journal Article";
+    if (t == "mgzn") return "Magazine Article";
+    if (t == "news") return "Newspaper Article";
+    if (t == "book" || t == "ebook") return "Book, Whole";
+    if (t == "edbook") return "Book, Edited";
+    if (t == "chap" || t == "echap") return "Book, Section";
+    if (t == "conf" || t == "cpaper" || t == "cpapr") return "Conference Proceedings";
+    if (t == "thes") return "Dissertation/Thesis";
+    if (t == "rprt") return "Report";
+    return "Generic";
+}
+
+std::vector<Record> parseRIS(const Rcpp::CharacterVector& lines) {
+    std::vector<Record> records;
+    Record cur;
+    bool inRecord = false;
+    std::string lastTag;
+
+    auto flush = [&]() {
+        if (inRecord) records.push_back(cur);
+        cur = Record();
+        inRecord = false;
+        lastTag.clear();
+    };
+
+    // RIS tag -> internal tag. BT depends on the record type, handled below.
+    static const std::map<std::string, std::string> tagMap = {
+        {"AU", "A1"}, {"A1", "A1"}, {"A2", "A2"}, {"ED", "A2"}, {"TI", "T1"}, {"T1", "T1"},
+        {"T2", "T2"}, {"T3", "T3"}, {"JO", "JO"}, {"JF", "JF"}, {"JA", "JA"}, {"J2", "JA"},
+        {"PY", "YR"}, {"Y1", "YR"}, {"DA", "FD"}, {"VL", "VO"}, {"IS", "IS"}, {"SP", "SP"},
+        {"EP", "OP"}, {"KW", "K1"}, {"AB", "AB"}, {"N2", "AB"}, {"N1", "NO"}, {"PB", "PB"},
+        {"CY", "PP"}, {"SN", "SN"}, {"DO", "DO"}, {"UR", "LK"}, {"L1", "LK"}, {"LA", "LA"},
+        {"ET", "ED"}};
+
+    for (R_xlen_t i = 0; i < lines.size(); ++i) {
+        if (Rcpp::CharacterVector::is_na(lines[i])) continue;
+        std::string line = Rcpp::as<std::string>(lines[i]);
+        if (!line.empty() && line.back() == '\r') line.pop_back();
+        if (i == 0 && line.size() >= 3 && static_cast<unsigned char>(line[0]) == 0xEF &&
+            static_cast<unsigned char>(line[1]) == 0xBB &&
+            static_cast<unsigned char>(line[2]) == 0xBF)
+            line.erase(0, 3);  // strip UTF-8 BOM
+        if (trim(line).empty()) continue;
+
+        std::string tag, val;
+        if (parseRisLine(line, tag, val)) {
+            if (tag == "TY") {
+                flush();
+                inRecord = true;
+                cur.type = risTypeToRefWorks(val);
+                lastTag.clear();
+            } else if (tag == "ER") {
+                flush();
+            } else if (inRecord) {
+                std::string mapped;
+                if (tag == "BT") {
+                    mapped = (cur.type == "Book, Whole" || cur.type == "Book, Edited") ? "T1" : "T2";
+                } else {
+                    auto it = tagMap.find(tag);
+                    mapped = (it == tagMap.end()) ? "" : it->second;
+                }
+                lastTag = mapped;
+                if (!mapped.empty() && !val.empty()) cur.f[mapped].push_back(val);
+            }
+        } else if (inRecord && !lastTag.empty() && !cur.f[lastTag].empty()) {
+            cur.f[lastTag].back() += " " + trim(line);  // wrapped continuation line
+        }
+    }
+    flush();
+    return records;
+}
+
 // ---------- BibTeX generation ----------
 
 std::string bibType(const std::string& rt) {
@@ -295,7 +406,7 @@ std::string toBibtex(const Record& r, std::set<std::string>& used) {
 
     // container / venue
     if (type == "article") {
-        addBraced("journal", firstOf(r, {"JF", "JO", "T2"}));
+        addBraced("journal", firstOf(r, {"JF", "JO", "T2", "JA"}));
     } else if (type == "incollection" || type == "inproceedings") {
         addBraced("booktitle", firstOf(r, {"T2", "JF"}));
     }
@@ -358,14 +469,17 @@ std::string toBibtex(const Record& r, std::set<std::string>& used) {
 
 }  // namespace
 
-//' Convert RefWorks Tagged Format lines to BibTeX entries
+//' Convert RefWorks citations (Tagged Format or RIS) to BibTeX entries
 //'
-//' @param lines Character vector of lines in RefWorks Tagged Format (e.g. from readLines()).
-//' @return Character vector with one BibTeX entry per RefWorks record.
+//' The format is detected automatically: lines starting with `TY  - ` mean RIS,
+//' otherwise RefWorks Tagged Format (`RT`, `A1`, `T1`, ...) is assumed.
+//'
+//' @param lines Character vector of lines from the export (e.g. from readLines()).
+//' @return Character vector with one BibTeX entry per record.
 //' @export
 // [[Rcpp::export]]
 Rcpp::CharacterVector refworks_to_bib(Rcpp::CharacterVector lines) {
-    std::vector<Record> records = parseRefWorks(lines);
+    std::vector<Record> records = looksLikeRis(lines) ? parseRIS(lines) : parseRefWorks(lines);
     std::set<std::string> used;
     Rcpp::CharacterVector out(records.size());
     for (size_t i = 0; i < records.size(); ++i) {

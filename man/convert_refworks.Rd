@@ -2,12 +2,12 @@
 % Please edit documentation in R/convert_refworks.R
 \name{convert_refworks}
 \alias{convert_refworks}
-\title{Convert a RefWorks Tagged Format export to a .bib file}
+\title{Convert a RefWorks export (Tagged Format or RIS) to a .bib file}
 \usage{
 convert_refworks(input, output = NULL)
 }
 \arguments{
-\item{input}{Path to the RefWorks tagged-format text file.}
+\item{input}{Path to the exported citation file (`.txt` or `.ris`).}
 
 \item{output}{Path for the .bib file. If `NULL` (the default), nothing is
 written and the entries are returned.}
@@ -17,8 +17,9 @@ A character vector with one BibTeX entry per record (invisibly when
   `output` is given).
 }
 \description{
-Reads citations exported from RefWorks in Tagged Format and converts them to
-BibTeX entries using compiled C++ code.
+Reads citations exported from RefWorks in either RefWorks Tagged Format or
+RIS format (detected automatically) and converts them to BibTeX entries
+using compiled C++ code.
 }
 \examples{
 f <- system.file("extdata", "sample_refworks.txt", package = "biblio")

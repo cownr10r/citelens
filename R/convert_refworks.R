@@ -1,9 +1,10 @@
-#' Convert a RefWorks Tagged Format export to a .bib file
+#' Convert a RefWorks export (Tagged Format or RIS) to a .bib file
 #'
-#' Reads citations exported from RefWorks in Tagged Format and converts them to
-#' BibTeX entries using compiled C++ code.
+#' Reads citations exported from RefWorks in either RefWorks Tagged Format or
+#' RIS format (detected automatically) and converts them to BibTeX entries
+#' using compiled C++ code.
 #'
-#' @param input Path to the RefWorks tagged-format text file.
+#' @param input Path to the exported citation file (`.txt` or `.ris`).
 #' @param output Path for the .bib file. If `NULL` (the default), nothing is
 #'   written and the entries are returned.
 #'
@@ -19,7 +20,7 @@ convert_refworks <- function(input, output = NULL) {
   entries <- refworks_to_bib(lines)
 
   if (length(entries) == 0) {
-    warning("No RefWorks records found (expected lines starting with 'RT ').",
+    warning("No records found (expected RefWorks Tagged lines starting with 'RT ' or RIS lines starting with 'TY  - ').",
             call. = FALSE)
   }
 

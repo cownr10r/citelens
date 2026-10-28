@@ -2,16 +2,17 @@
 % Please edit documentation in R/RcppExports.R
 \name{refworks_to_bib}
 \alias{refworks_to_bib}
-\title{Convert RefWorks Tagged Format lines to BibTeX entries}
+\title{Convert RefWorks citations (Tagged Format or RIS) to BibTeX entries}
 \usage{
 refworks_to_bib(lines)
 }
 \arguments{
-\item{lines}{Character vector of lines in RefWorks Tagged Format (e.g. from readLines()).}
+\item{lines}{Character vector of lines from the export (e.g. from readLines()).}
 }
 \value{
-Character vector with one BibTeX entry per RefWorks record.
+Character vector with one BibTeX entry per record.
 }
 \description{
-Convert RefWorks Tagged Format lines to BibTeX entries
+The format is detected automatically: lines starting with `TY  - ` mean RIS,
+otherwise RefWorks Tagged Format (`RT`, `A1`, `T1`, ...) is assumed.
 }

@@ -11,5 +11,10 @@ Converts citations exported from RefWorks in Tagged Format into BibTeX (.bib) en
 \author{
 \strong{Maintainer}: Mario Martinez \email{mario.a.martinez@live.com}
 
+Authors:
+\itemize{
+  \item Mario Martinez \email{mario.a.martinez@live.com}
+}
+
 }
 \keyword{internal}
