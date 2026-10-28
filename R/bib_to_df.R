@@ -32,7 +32,7 @@
 #' @export
 bib_to_df <- function(input, clean = TRUE, xlsx = NULL) {
   if (!file.exists(input)) stop("File not found: ", input, call. = FALSE)
-  lines <- readLines(input, encoding = "UTF-8", warn = FALSE)
+  lines <- .read_text_lines(input)
   df <- bib_parse_cpp(lines, isTRUE(clean))
 
   if (nrow(df) == 0) {

@@ -56,3 +56,70 @@ test_that("bad input is handled", {
   expect_warning(df <- bib_to_df(empty), "No BibTeX entries")
   expect_equal(nrow(df), 0)
 })
+
+test_that("xlsx export writes a readable Excel file", {
+  skip_if_not_installed("readxl")
+  out <- tempfile(fileext = ".xlsx")
+  expect_message(res <- bib_to_df(sample_bib, xlsx = out), "Wrote 3 entries")
+  expect_true(file.exists(out))
+  # returns the data frame invisibly
+  expect_equal(nrow(res), 3)
+  x <- readxl::read_excel(out, col_types = "text")
+  expect_equal(nrow(x), 3)
+  expect_equal(names(x), names(res))
+  expect_equal(x$bibkey, c("tinto2006", "bailey2015", "nobody2020"))
+  expect_equal(x$title[1], "Research and practice of student retention: What next?")
+  expect_true(is.na(x$author[3]))
+})
+
+test_that("xlsx extension is added and bad paths are rejected", {
+  base <- tempfile()
+  suppressMessages(bib_to_df(sample_bib, xlsx = base))
+  expect_true(file.exists(paste0(base, ".xlsx")))
+  expect_error(bib_to_df(sample_bib, xlsx = file.path(tempdir(), "nope", "x.xlsx")),
+               "Folder does not exist")
+  expect_error(bib_to_df(sample_bib, xlsx = c("a.xlsx", "b.xlsx")), "single file path")
+})
+
+test_that("an empty .bib does not produce an Excel file", {
+  empty <- tempfile(); writeLines("nothing here", empty)
+  out <- tempfile(fileext = ".xlsx")
+  expect_warning(bib_to_df(empty, xlsx = out), "No BibTeX entries")
+  expect_false(file.exists(out))
+})
+
+test_that("non-UTF-8 text and illegal control characters are cleaned", {
+  f <- tempfile(fileext = ".bib")
+  txt <- paste(c("@article{bad1,",
+                 "  title = {A \x93curly\x94 title and it\x92s apostrophe},",
+                 "  abstract = {Has a control\x0b char and another\x1f one},",
+                 "  year = 2020", "}"), collapse = "\n")
+  con <- file(f, "wb"); writeBin(charToRaw(txt), con); close(con)
+
+  expect_message(df <- bib_to_df(f), "converted from Windows-1252")
+  expect_true(all(validUTF8(unlist(df))))
+  expect_equal(df$title, "A “curly” title and it’s apostrophe")
+  expect_equal(df$abstract, "Has a control char and another one")
+})
+
+test_that("an xlsx made from messy text opens cleanly", {
+  skip_if_not_installed("readxl")
+  f <- tempfile(fileext = ".bib")
+  txt <- "@article{bad1,\n  title = {It\x92s \x93quoted\x94},\n  abstract = {ctrl\x0b\x1f here},\n  year = 2020\n}"
+  con <- file(f, "wb"); writeBin(charToRaw(txt), con); close(con)
+  out <- tempfile(fileext = ".xlsx")
+  suppressMessages(bib_to_df(f, xlsx = out))
+  x <- readxl::read_excel(out, col_types = "text")
+  expect_equal(nrow(x), 1)
+  expect_equal(x$title, "It’s “quoted”")
+  expect_equal(x$abstract, "ctrl here")
+})
+
+test_that("convert_refworks also cleans messy input", {
+  f <- tempfile(fileext = ".txt")
+  txt <- "RT Journal Article\nA1 Smith, Jo\nT1 It\x92s a test\x0b\nYR 2020\n"
+  con <- file(f, "wb"); writeBin(charToRaw(txt), con); close(con)
+  out <- suppressMessages(convert_refworks(f))
+  expect_true(all(validUTF8(out)))
+  expect_match(out, "It’s a test", fixed = TRUE)
+})

@@ -483,7 +483,7 @@ Rcpp::CharacterVector refworks_to_bib(Rcpp::CharacterVector lines) {
     std::set<std::string> used;
     Rcpp::CharacterVector out(records.size());
     for (size_t i = 0; i < records.size(); ++i) {
-        out[i] = toBibtex(records[i], used);
+        out[i] = Rcpp::String(toBibtex(records[i], used), CE_UTF8);
     }
     return out;
 }

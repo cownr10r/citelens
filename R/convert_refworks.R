@@ -16,7 +16,7 @@
 #' @export
 convert_refworks <- function(input, output = NULL) {
   if (!file.exists(input)) stop("File not found: ", input, call. = FALSE)
-  lines   <- readLines(input, encoding = "UTF-8", warn = FALSE)
+  lines   <- .read_text_lines(input)
   entries <- refworks_to_bib(lines)
 
   if (length(entries) == 0) {
