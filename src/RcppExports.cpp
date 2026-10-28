@@ -10,6 +10,18 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// bib_parse_cpp
+Rcpp::List bib_parse_cpp(Rcpp::CharacterVector lines, bool clean);
+RcppExport SEXP _biblio_bib_parse_cpp(SEXP linesSEXP, SEXP cleanSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type lines(linesSEXP);
+    Rcpp::traits::input_parameter< bool >::type clean(cleanSEXP);
+    rcpp_result_gen = Rcpp::wrap(bib_parse_cpp(lines, clean));
+    return rcpp_result_gen;
+END_RCPP
+}
 // refworks_to_bib
 Rcpp::CharacterVector refworks_to_bib(Rcpp::CharacterVector lines);
 RcppExport SEXP _biblio_refworks_to_bib(SEXP linesSEXP) {
@@ -23,6 +35,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_biblio_bib_parse_cpp", (DL_FUNC) &_biblio_bib_parse_cpp, 2},
     {"_biblio_refworks_to_bib", (DL_FUNC) &_biblio_refworks_to_bib, 1},
     {NULL, NULL, 0}
 };

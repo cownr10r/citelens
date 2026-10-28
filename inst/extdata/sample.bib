@@ -1,0 +1,31 @@
+% A small BibTeX file that exercises the parser
+
+@comment{This block is ignored.}
+
+@string{jcsr = "Journal of College Student Retention"}
+
+@preamble{"\newcommand{\noop}[1]{}"}
+
+@article{tinto2006,
+  author   = {Tinto, Vincent},
+  title    = {{Research and practice of student retention: What next?}},
+  journal  = jcsr # ": Research, Theory \& Practice",
+  year     = 2006,
+  month    = jan,
+  pages    = {1--19},
+  doi      = {10.2190/4NWK-STAC-2PLH-PJ3D},
+  abstract = {Line one
+    continues on line two.}
+}
+
+@book(bailey2015,
+  author    = "Bailey, Thomas R. and Jaggars, Shanna Smith",
+  title     = {Redesigning {America}'s Community Colleges},
+  year      = {2015},
+  publisher = {Harvard University Press},
+)
+
+@inproceedings{nobody2020,
+  title = {A title with a {nested {brace}} group},
+  year  = 2020
+}
