@@ -30,6 +30,9 @@ compiler:
 | `refworks_to_xlsx(input, xlsx)` | One step: RefWorks export to an Excel file (optionally saves a `.bib` too) |
 | `convert_refworks(input, output)` | RefWorks export to BibTeX entries / a `.bib` file |
 | `bib_to_df(input, xlsx = NULL)` | BibTeX file to a data frame (optionally also an Excel file) |
+| `scholar_html_to_bib(input, output)` | A saved Google Scholar results page to BibTeX |
+| `scholar_parse_html(input)` | A saved Google Scholar results page to a data frame |
+| `fetch_abstracts(refs)` | Look up missing abstracts in OpenAlex (by DOI or title) |
 
 **Text analytics on abstracts** (these work on the data frame from `bib_to_df()`)
 
@@ -101,6 +104,88 @@ refs <- bib_to_df(system.file("extdata", "sample_abstracts.bib", package = "bibl
 one column for every BibTeX field in the file (`author`, `title`, `journal`,
 `year`, `doi`, ...). Fields an entry does not have are `NA`, and every column is
 character.
+
+## Google Scholar results
+
+Save a Google Scholar results page from your browser (File > Save Page As,
+"Webpage, HTML Only"), then:
+
+```r
+scholar_parse_html("~/Downloads/scholar_page1.html")            # data frame of results
+scholar_html_to_bib("~/Downloads/scholar_page1.html", "scholar.bib")
+
+# a whole folder: every .html file in it is read and combined
+scholar_parse_html("~/Documents/scholar_pages")
+scholar_html_to_bib("~/Documents/scholar_pages", "scholar.bib")   # repeated results are removed
+
+# or a list of files; recursive = TRUE also reads subfolders
+scholar_html_to_bib(c("page1.html", "page2.html"), "scholar.bib")
+scholar_parse_html("~/Documents/scholar_pages", recursive = TRUE)
+```
+
+Files in the folder that are not Scholar results pages are skipped with a warning
+naming them. The `source_file` column shows which file each result came from.
+
+This reads only the saved file; it never contacts Google Scholar, which blocks
+automated requests. The results list shows title, authors, venue, year,
+publisher and link, but it shortens long author lists and venue names with "..."
+and has no volume, pages, DOI or abstract. Shortened entries get a `note` field
+in the BibTeX (and `authors_truncated` / `venue_truncated` in the data frame) so
+you can find them. For complete records use Scholar's **Cite > BibTeX** (or
+**My library > Export**), which `bib_to_df()` reads directly, or its
+**RefWorks / RefMan** exports, which `convert_refworks()` reads.
+
+### Getting abstracts for Scholar results
+
+Scholar's results list has no abstracts (only short search snippets), so look them
+up in [OpenAlex](https://openalex.org), a free scholarly index with an official API.
+OpenAlex now requires a free **API key**:
+
+1. Create a free account at <https://openalex.org>.
+2. Copy your key from <https://openalex.org/settings/api>.
+3. Save it once in R (it is picked up automatically afterwards):
+   ```r
+   Sys.setenv(OPENALEX_API_KEY = "your-key")        # this session
+   usethis::edit_r_environ()                        # permanently: add OPENALEX_API_KEY=your-key
+   ```
+
+```r
+res <- scholar_parse_html("~/Downloads/scholar_page1.html")
+res <- fetch_abstracts(res)                       # or fetch_abstracts(res, api_key = "your-key")
+topic_model(res, k = 4, id = "title")             # then use the text analytics
+
+# or straight into BibTeX, abstracts included
+scholar_html_to_bib("scholar_page1.html", "scholar.bib", abstracts = TRUE)
+```
+
+A free key allows 100,000 credits a day; a title lookup costs 10, so a few
+thousand references fit in a day. Without a key you get only about 100 credits a
+day. If OpenAlex says the allowance is used up, the function stops and keeps what
+it found; run it again on that result and it looks up only what is still missing.
+
+Each title (or DOI) and your key are sent to OpenAlex. A match is accepted only when
+the title is very close and the year agrees within a year; otherwise the abstract
+stays `NA` rather than risk the wrong paper. Many but not all works have an abstract
+in OpenAlex, so expect some gaps. Check `abstract_match` and `abstract_source` to
+spot-check results. `fetch_abstracts()` also works on a `bib_to_df()` table that has
+DOIs.
+
+To see why some references have no abstract, look at `abstract_status`:
+
+```r
+table(res$abstract_status)
+res[res$abstract_status == "title not matched", c("title", "closest_title", "closest_score")]
+
+# if the closest titles are the right papers, accept looser matches (only missing ones are retried)
+res <- fetch_abstracts(res, min_match = 0.75)
+
+# "year differs": the title matched but the years are far apart (re-editions, online-first dates)
+res[res$abstract_status == "year differs", c("title", "year", "closest_year")]
+res <- fetch_abstracts(res, max_year_diff = 10)
+```
+
+Statuses: `found`, `no abstract on file` (OpenAlex has the paper but no abstract),
+`title not matched`, `year differs`, `no results`, `lookup failed`.
 
 ## Topic modeling of abstracts
 
