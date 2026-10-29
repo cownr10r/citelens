@@ -97,6 +97,7 @@ print.biblio_similarity <- function(x, ...) {
   cat("pairwise cosine similarity: median ", format(round(stats::median(off), 3)),
       ", 90th percentile ", format(round(unname(stats::quantile(off, 0.9)), 3)),
       ", max ", format(round(max(off), 3)), "\n", sep = "")
+  cat("Use similarity_to_df(s) for a table (and xlsx = \"file.xlsx\" to save it to Excel).\n")
   invisible(x)
 }
 
@@ -214,4 +215,99 @@ plot_similarity <- function(s, order = TRUE, labels = length(s$doc_ids) <= 40,
     p <- p + ggplot2::theme(axis.text = ggplot2::element_blank())
   }
   p
+}
+
+#' Similarity results as a data frame (optionally saved to Excel)
+#'
+#' Turns the result of [doc_similarity()] into a data frame you can view, filter
+#' and save. Two layouts are available:
+#'
+#' * `type = "matrix"`: one row and one column per reference, with the cosine
+#'   similarity in each cell (the table behind the heatmap).
+#' * `type = "pairs"`: one row per pair of references, most similar first, which
+#'   is easier to sort, filter and scan.
+#'
+#' If you give `xlsx`, an Excel workbook is written with **both** layouts, on
+#' sheets named `similarity_matrix` and `pairs`, whichever `type` you asked for.
+#'
+#' @param s A result from [doc_similarity()].
+#' @param type `"matrix"` (default) or `"pairs"`.
+#' @param data Optional: the data frame passed to [doc_similarity()]. If given,
+#'   the `title` column is added (`title` in the matrix; `title_1` and `title_2`
+#'   in the pairs).
+#' @param title Name of the title column in `data`.
+#' @param digits Decimal places to round the similarities to (default 3). Use
+#'   `NULL` for no rounding.
+#' @param cutoff For `type = "pairs"` (and the pairs sheet in Excel): keep only
+#'   pairs at or above this similarity (0 to 1). Default 0 keeps every pair.
+#' @param xlsx Optional path for an Excel file (e.g. `"~/Desktop/similarity.xlsx"`).
+#'   A missing `.xlsx` ending is added. When given, the data frame is returned
+#'   invisibly.
+#' @return A data frame. For `"matrix"`: `id` (plus `title`) and one column per
+#'   reference. For `"pairs"`: `id_1`, `id_2`, `similarity` (plus `title_1`,
+#'   `title_2`).
+#' @examples
+#' f <- system.file("extdata", "sample_abstracts.bib", package = "biblio")
+#' refs <- bib_to_df(f)
+#' s <- doc_similarity(refs)
+#' head(similarity_to_df(s, "pairs", data = refs), 3)
+#' out <- tempfile(fileext = ".xlsx")
+#' similarity_to_df(s, data = refs, xlsx = out)
+#' @export
+similarity_to_df <- function(s, type = c("matrix", "pairs"), data = NULL, title = "title",
+                             digits = 3, cutoff = 0, xlsx = NULL) {
+  .check_sim(s)
+  type <- match.arg(type)
+  if (!is.null(xlsx)) xlsx <- .xlsx_path(xlsx)      # fail early on a bad path
+  if (!is.null(digits) && (!is.numeric(digits) || length(digits) != 1 || digits < 0)) {
+    stop("`digits` must be a non-negative number, or NULL.", call. = FALSE)
+  }
+
+  titles <- NULL
+  if (!is.null(data) && title %in% names(data)) {
+    titles <- as.character(data[[title]])[s$doc_rows]
+  }
+
+  make_matrix <- function() {
+    m <- s$sim
+    if (!is.null(digits)) m <- round(m, digits)
+    colnames(m) <- make.unique(s$doc_ids)
+    rownames(m) <- NULL
+    out <- data.frame(id = s$doc_ids, stringsAsFactors = FALSE)
+    if (!is.null(titles)) out$title <- titles
+    cbind(out, as.data.frame(m, check.names = FALSE, stringsAsFactors = FALSE))
+  }
+  make_pairs <- function() {
+    p <- find_duplicates(s, cutoff = cutoff, data = data, title = title)
+    if (!is.null(digits)) p$similarity <- round(p$similarity, digits)
+    p
+  }
+
+  result <- if (type == "matrix") make_matrix() else make_pairs()
+
+  if (!is.null(xlsx)) {
+    mat <- if (type == "matrix") result else make_matrix()
+    prs <- if (type == "pairs") result else make_pairs()
+    sheets <- list(similarity_matrix = mat, pairs = prs)
+    if (ncol(mat) > 16384) {
+      stop("Too many references (", length(s$doc_ids), ") for an Excel sheet; ",
+           "use type = \"pairs\" with a cutoff instead.", call. = FALSE)
+    }
+    if (nrow(prs) > 1048575) {
+      message("The pairs table has ", nrow(prs), " rows, more than an Excel sheet holds; ",
+              "leaving it out. Raise `cutoff` to keep only the most similar pairs.")
+      sheets$pairs <- NULL
+    }
+    writexl::write_xlsx(sheets, xlsx)
+    message("Wrote the similarity matrix (", nrow(mat), " x ", length(s$doc_ids), ") and ",
+            nrow(prs), " pair(s) to ", xlsx)
+    return(invisible(result))
+  }
+  result
+}
+
+#' @export
+as.data.frame.biblio_similarity <- function(x, row.names = NULL, optional = FALSE,
+                                            type = "pairs", ...) {
+  similarity_to_df(x, type = type, ...)
 }
