@@ -123,6 +123,23 @@ plot_similarity(s)                      # heatmap, similar abstracts grouped tog
 Similarity reflects shared vocabulary, not meaning. Use `stopwords = ` to drop
 words common to your whole collection.
 
+## Trends over time
+
+See whether words or topics rise and fall across publication years:
+
+```r
+w <- word_trends(refs, words = c("equity", "belonging", "enrollment"), bin = 5)
+w                       # share of abstracts mentioning each word, per period
+plot_word_trends(w)
+
+m <- topic_model(refs, k = 5, seed = 1)
+tt <- topic_trends(m, refs, bin = 5)
+plot_topic_trends(tt)
+```
+
+`bin` groups years (5 = five-year periods). Check `n_period`, the number of
+abstracts in each period: periods with only a few abstracts give jumpy shares.
+
 ## Good to know
 
 - **Citation keys** are generated as author + year + first meaningful title word
