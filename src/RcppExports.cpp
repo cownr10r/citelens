@@ -50,11 +50,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cosine_sparse_cpp
+Rcpp::NumericMatrix cosine_sparse_cpp(Rcpp::List ids, Rcpp::List weights, int V);
+RcppExport SEXP _biblio_cosine_sparse_cpp(SEXP idsSEXP, SEXP weightsSEXP, SEXP VSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type ids(idsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type weights(weightsSEXP);
+    Rcpp::traits::input_parameter< int >::type V(VSEXP);
+    rcpp_result_gen = Rcpp::wrap(cosine_sparse_cpp(ids, weights, V));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_biblio_bib_parse_cpp", (DL_FUNC) &_biblio_bib_parse_cpp, 2},
     {"_biblio_lda_gibbs_cpp", (DL_FUNC) &_biblio_lda_gibbs_cpp, 7},
     {"_biblio_refworks_to_bib", (DL_FUNC) &_biblio_refworks_to_bib, 1},
+    {"_biblio_cosine_sparse_cpp", (DL_FUNC) &_biblio_cosine_sparse_cpp, 3},
     {NULL, NULL, 0}
 };
 

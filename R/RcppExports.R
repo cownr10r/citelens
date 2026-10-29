@@ -38,3 +38,14 @@ refworks_to_bib <- function(lines) {
     .Call(`_biblio_refworks_to_bib`, lines)
 }
 
+#' Cosine similarity of sparse document vectors (internal)
+#'
+#' @param ids List of integer vectors of 0-based word ids (each id at most once per document).
+#' @param weights List of numeric vectors, the weight of each word in the matching `ids`.
+#' @param V Vocabulary size.
+#' @return A D x D numeric matrix of cosine similarities (NA for documents with no weight).
+#' @noRd
+cosine_sparse_cpp <- function(ids, weights, V) {
+    .Call(`_biblio_cosine_sparse_cpp`, ids, weights, V)
+}
+

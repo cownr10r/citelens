@@ -107,6 +107,22 @@ use `max_doc_prop = 0.5` to drop words found in over half the abstracts. A
 sample file lives at `system.file("extdata", "sample_abstracts.bib", package = "biblio")`
 (synthetic text, for trying things out).
 
+## Document similarity
+
+Find which abstracts are most alike (cosine similarity of TF-IDF word weights):
+
+```r
+s <- doc_similarity(refs)               # compares every pair of abstracts
+s                                       # quick summary
+
+similar_to(s, "smith2019retention", n = 5, data = refs)   # closest matches to one paper
+find_duplicates(s, cutoff = 0.9, data = refs)             # likely duplicate entries
+plot_similarity(s)                      # heatmap, similar abstracts grouped together
+```
+
+Similarity reflects shared vocabulary, not meaning. Use `stopwords = ` to drop
+words common to your whole collection.
+
 ## Good to know
 
 - **Citation keys** are generated as author + year + first meaningful title word
