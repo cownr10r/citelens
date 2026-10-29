@@ -44,6 +44,7 @@ compiler:
 | `topic_k_search(refs, k = 2:8)` | Compare numbers of topics to help choose `k` |
 | `doc_similarity(refs)` | Cosine similarity between every pair of abstracts |
 | `similar_to()`, `find_duplicates()`, `plot_similarity()` | Closest matches to one paper, likely duplicate entries, and a heatmap with the numbers in each box |
+| `similarity_to_df(s, xlsx = )` | The similarities as a data frame (matrix or pairs layout), optionally saved to Excel |
 | `word_trends(refs, words)` | Share of abstracts mentioning a word, by year or group of years |
 | `topic_trends(model, refs)` | Each topic's share by year or group of years |
 | `plot_word_trends()`, `plot_topic_trends()` | Line charts of the trends |
@@ -226,6 +227,20 @@ similar_to(s, "smith2019retention", n = 5, data = refs)   # closest matches to o
 find_duplicates(s, cutoff = 0.9, data = refs)             # likely duplicate entries
 plot_similarity(s)                      # heatmap, similar abstracts grouped together
 ```
+
+Get the numbers as a data frame, and optionally save them to Excel:
+
+```r
+similarity_to_df(s, data = refs)                    # matrix: one row and column per reference
+similarity_to_df(s, "pairs", data = refs)           # pairs: one row per pair, most similar first
+similarity_to_df(s, "pairs", cutoff = 0.5)          # only pairs at or above 0.5
+similarity_to_df(s, data = refs, xlsx = "~/Desktop/similarity.xlsx")   # Excel, both layouts
+as.data.frame(s)                                    # same as the pairs layout
+```
+
+The Excel workbook has two sheets, `similarity_matrix` and `pairs`, whichever
+layout you asked for. Similarities are rounded to 3 decimals (`digits = NULL` for
+no rounding).
 
 Similarity reflects shared vocabulary, not meaning. Use `stopwords = ` to drop
 words common to your whole collection.
