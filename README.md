@@ -80,6 +80,33 @@ one column for every BibTeX field in the file (`author`, `title`, `journal`,
 `year`, `doi`, ...). Fields an entry does not have are `NA`, and every column is
 character.
 
+## Topic modeling of abstracts
+
+Find the main themes in the abstracts of a reference data frame (LDA, fitted in C++):
+
+```r
+refs <- bib_to_df("references.bib")
+
+m <- topic_model(refs, k = 5, seed = 1)   # 5 topics
+m                                          # summary: prevalence, coherence, top words
+
+topic_terms(m, n = 10)        # top words per topic (data frame)
+topic_summary(m)              # one row per topic
+refs2 <- topic_documents(m, refs)   # your table + dominant_topic, dominant_prob, topic_1..k
+
+plot_topic_terms(m)           # bar charts of each topic's top words
+plot_topic_prevalence(m)      # how common each topic is
+
+ks <- topic_k_search(refs, k = 2:8, seed = 1)   # which k?
+plot(ks)
+```
+
+Tips: topic models work best with dozens of abstracts or more. Add words that
+carry no meaning for your field with `stopwords = c("student", "college")`, and
+use `max_doc_prop = 0.5` to drop words found in over half the abstracts. A
+sample file lives at `system.file("extdata", "sample_abstracts.bib", package = "biblio")`
+(synthetic text, for trying things out).
+
 ## Good to know
 
 - **Citation keys** are generated as author + year + first meaningful title word

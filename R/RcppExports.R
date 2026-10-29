@@ -11,6 +11,21 @@ bib_parse_cpp <- function(lines, clean) {
     .Call(`_biblio_bib_parse_cpp`, lines, clean)
 }
 
+#' Collapsed Gibbs sampler for LDA (internal)
+#'
+#' @param docs List of integer vectors holding 0-based word ids, one vector per document.
+#' @param V Vocabulary size.
+#' @param K Number of topics.
+#' @param alpha Symmetric Dirichlet prior on each document's topic mixture.
+#' @param beta Symmetric Dirichlet prior on each topic's word distribution.
+#' @param n_iter Number of full sweeps over all tokens.
+#' @param log_every Record the log-likelihood every this many sweeps.
+#' @return List with `phi` (K x V), `theta` (D x K), `loglik` (trace) and `loglik_iter`.
+#' @noRd
+lda_gibbs_cpp <- function(docs, V, K, alpha, beta, n_iter, log_every) {
+    .Call(`_biblio_lda_gibbs_cpp`, docs, V, K, alpha, beta, n_iter, log_every)
+}
+
 #' Convert RefWorks citations (Tagged Format or RIS) to BibTeX entries
 #'
 #' The format is detected automatically: lines starting with `TY  - ` mean RIS,

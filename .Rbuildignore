@@ -1,2 +1,4 @@
-^biblio\.Rproj$
+^.*\.Rproj$
 ^\.Rproj\.user$
+^\.github$
+^data-raw$

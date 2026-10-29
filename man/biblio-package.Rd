@@ -8,14 +8,6 @@
 \description{
 Converts citations exported from RefWorks in Tagged Format into BibTeX (.bib) entries. The conversion is implemented in C++ via Rcpp.
 }
-\seealso{
-Useful links:
-\itemize{
-  \item \url{https://github.com/cownr10r/biblio}
-  \item Report bugs at \url{https://github.com/cownr10r/biblio/issues}
-}
-
-}
 \author{
 \strong{Maintainer}: Mario Martinez \email{mario.a.martinez@live.com}
 

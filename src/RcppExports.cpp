@@ -22,6 +22,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// lda_gibbs_cpp
+Rcpp::List lda_gibbs_cpp(Rcpp::List docs, int V, int K, double alpha, double beta, int n_iter, int log_every);
+RcppExport SEXP _biblio_lda_gibbs_cpp(SEXP docsSEXP, SEXP VSEXP, SEXP KSEXP, SEXP alphaSEXP, SEXP betaSEXP, SEXP n_iterSEXP, SEXP log_everySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type docs(docsSEXP);
+    Rcpp::traits::input_parameter< int >::type V(VSEXP);
+    Rcpp::traits::input_parameter< int >::type K(KSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< double >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< int >::type n_iter(n_iterSEXP);
+    Rcpp::traits::input_parameter< int >::type log_every(log_everySEXP);
+    rcpp_result_gen = Rcpp::wrap(lda_gibbs_cpp(docs, V, K, alpha, beta, n_iter, log_every));
+    return rcpp_result_gen;
+END_RCPP
+}
 // refworks_to_bib
 Rcpp::CharacterVector refworks_to_bib(Rcpp::CharacterVector lines);
 RcppExport SEXP _biblio_refworks_to_bib(SEXP linesSEXP) {
@@ -36,6 +53,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_biblio_bib_parse_cpp", (DL_FUNC) &_biblio_bib_parse_cpp, 2},
+    {"_biblio_lda_gibbs_cpp", (DL_FUNC) &_biblio_lda_gibbs_cpp, 7},
     {"_biblio_refworks_to_bib", (DL_FUNC) &_biblio_refworks_to_bib, 1},
     {NULL, NULL, 0}
 };

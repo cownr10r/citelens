@@ -7,14 +7,8 @@ Description: Converts citations exported from RefWorks in Tagged Format into
     BibTeX (.bib) entries. The conversion is implemented in C++ via Rcpp.
 License: MIT + file LICENSE
 Encoding: UTF-8
-Imports: 
-    Rcpp,
-    writexl
+Imports: Rcpp, writexl, ggplot2
 LinkingTo: Rcpp
-Suggests: 
-    readxl,
-    testthat (>= 3.0.0)
+Suggests: readxl, testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.1
-URL: https://github.com/cownr10r/biblio
-BugReports: https://github.com/cownr10r/biblio/issues
