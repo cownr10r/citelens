@@ -11,7 +11,7 @@
 #'
 #' @param input Path to the `.bib` (or `.txt`) file.
 #' @param clean If `TRUE` (the default), tidy each value: remove grouping braces
-#'   (e.g. `{{Title}}` becomes `Title`), unescape backslash-escaped ampersands,
+#'   (e.g. a title wrapped in double braces becomes plain text), unescape backslash-escaped ampersands,
 #'   percent signs, dollar signs, hashes and underscores, and collapse line
 #'   breaks and repeated spaces. Other LaTeX commands, such as accents, are left
 #'   as they are. Use `FALSE` to get the raw values.
