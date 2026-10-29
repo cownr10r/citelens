@@ -170,9 +170,13 @@ find_duplicates <- function(s, cutoff = 0.9, data = NULL, title = "title") {
 #'   together (hierarchical clustering).
 #' @param labels Show reference ids on the axes? Defaults to `TRUE` for up to 40
 #'   abstracts.
+#' @param values Print the similarity number inside each box? Defaults to `TRUE`
+#'   for up to 30 abstracts; with more, the numbers get too small to read.
+#' @param digits Decimal places for the numbers (default 2).
 #' @return A ggplot object.
 #' @export
-plot_similarity <- function(s, order = TRUE, labels = length(s$doc_ids) <= 40) {
+plot_similarity <- function(s, order = TRUE, labels = length(s$doc_ids) <= 40,
+                            values = length(s$doc_ids) <= 30, digits = 2) {
   .check_sim(s)
   m <- s$sim
   ids <- s$doc_ids
@@ -186,6 +190,9 @@ plot_similarity <- function(s, order = TRUE, labels = length(s$doc_ids) <= 40) {
   g$a <- factor(g$a, levels = ids)
   g$b <- factor(g$b, levels = rev(ids))
 
+  g$label <- ifelse(is.na(g$similarity), "", formatC(g$similarity, format = "f", digits = digits))
+  g$dark <- !is.na(g$similarity) & g$similarity > 0.55
+
   p <- ggplot2::ggplot(g, ggplot2::aes(x = .data$a, y = .data$b, fill = .data$similarity)) +
     ggplot2::geom_tile() +
     ggplot2::scale_fill_gradient(low = "#f7fbff", high = "#08306b", limits = c(0, 1),
@@ -194,6 +201,13 @@ plot_similarity <- function(s, order = TRUE, labels = length(s$doc_ids) <= 40) {
     ggplot2::labs(title = "Document similarity", x = NULL, y = NULL) +
     ggplot2::theme_minimal(base_size = 11) +
     ggplot2::theme(panel.grid = ggplot2::element_blank())
+  if (isTRUE(values)) {
+    n <- length(ids)
+    p <- p +
+      ggplot2::geom_text(ggplot2::aes(label = .data$label, colour = .data$dark),
+                         size = max(1.6, min(3.5, 70 / n)), show.legend = FALSE) +
+      ggplot2::scale_colour_manual(values = c("FALSE" = "#1a1a1a", "TRUE" = "white"))
+  }
   if (isTRUE(labels)) {
     p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5))
   } else {

@@ -4,7 +4,13 @@
 \alias{plot_similarity}
 \title{Heatmap of document similarity}
 \usage{
-plot_similarity(s, order = TRUE, labels = length(s$doc_ids) <= 40)
+plot_similarity(
+  s,
+  order = TRUE,
+  labels = length(s$doc_ids) <= 40,
+  values = length(s$doc_ids) <= 30,
+  digits = 2
+)
 }
 \arguments{
 \item{s}{A result from [doc_similarity()].}
@@ -14,6 +20,11 @@ together (hierarchical clustering).}
 
 \item{labels}{Show reference ids on the axes? Defaults to `TRUE` for up to 40
 abstracts.}
+
+\item{values}{Print the similarity number inside each box? Defaults to `TRUE`
+for up to 30 abstracts; with more, the numbers get too small to read.}
+
+\item{digits}{Decimal places for the numbers (default 2).}
 }
 \value{
 A ggplot object.
