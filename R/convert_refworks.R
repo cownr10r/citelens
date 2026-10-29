@@ -11,7 +11,7 @@
 #' @return A character vector with one BibTeX entry per record (invisibly when
 #'   `output` is given).
 #' @examples
-#' f <- system.file("extdata", "sample_refworks.txt", package = "biblio")
+#' f <- system.file("extdata", "sample_refworks.txt", package = "citelens")
 #' cat(convert_refworks(f)[1])
 #' @export
 convert_refworks <- function(input, output = NULL) {

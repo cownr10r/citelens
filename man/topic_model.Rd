@@ -46,7 +46,7 @@ every abstract).}
 
 \item{min_word_length}{Drop words shorter than this many letters.}
 
-\item{stopwords}{Extra words to drop, in addition to [biblio_stopwords()].}
+\item{stopwords}{Extra words to drop, in addition to [citelens_stopwords()].}
 
 \item{singularize}{Merge simple plurals (default `TRUE`).}
 
@@ -54,7 +54,7 @@ every abstract).}
 reproduced.}
 }
 \value{
-An object of class `biblio_topics`. Use [topic_terms()],
+An object of class `citelens_topics`. Use [topic_terms()],
   [topic_documents()], [topic_summary()], [plot_topic_terms()] and
   [plot_topic_prevalence()] to explore it. Topics are numbered from the most
   to the least prevalent.
@@ -67,7 +67,7 @@ uses a collapsed Gibbs sampler written in C++.
 }
 \details{
 Text is lower-cased, punctuation and numbers are removed, stop words (see
-[biblio_stopwords()]) and very short words are dropped, and simple plurals are
+[citelens_stopwords()]) and very short words are dropped, and simple plurals are
 merged (students and student count as one word). Words that occur in fewer
 than `min_doc_freq` abstracts are ignored.
 
@@ -77,7 +77,7 @@ exploratory. Different `seed` values can give somewhat different topics;
 use [topic_k_search()] to help choose `k`.
 }
 \examples{
-f <- system.file("extdata", "sample_abstracts.bib", package = "biblio")
+f <- system.file("extdata", "sample_abstracts.bib", package = "citelens")
 refs <- bib_to_df(f)
 filler <- c("note", "time", "follow", "shape", "touch", "studied", "evidence",
             "work", "attention", "discussion")   # words from the synthetic sample

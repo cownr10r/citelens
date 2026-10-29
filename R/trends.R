@@ -43,7 +43,7 @@
 #'   `n_docs` (abstracts mentioning it), `n_period` (abstracts in the period)
 #'   and `share` (`n_docs / n_period`). Periods with no abstracts are omitted.
 #' @examples
-#' f <- system.file("extdata", "sample_abstracts.bib", package = "biblio")
+#' f <- system.file("extdata", "sample_abstracts.bib", package = "citelens")
 #' refs <- bib_to_df(f)
 #' word_trends(refs, words = c("retention", "tuition"), bin = 5)
 #' @export
@@ -67,7 +67,7 @@ word_trends <- function(data, words = NULL, n = 8, year = "year", text = "abstra
     message(nrow(data) - sum(keep), " reference(s) without an abstract or year were left out.")
   }
 
-  sw <- unique(c(.biblio_stopwords, tolower(stopwords)))
+  sw <- unique(c(.citelens_stopwords, tolower(stopwords)))
   tokens <- .tokenize(raw[keep], sw, min_word_length, isTRUE(singularize))
   uniq <- lapply(tokens, unique)
   period <- (yr[keep] %/% bin) * bin

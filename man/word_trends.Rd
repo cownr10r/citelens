@@ -31,7 +31,7 @@ the `n` words found in the most abstracts overall are used.}
 
 \item{bin}{Width of each period in years (1 = one row per year).}
 
-\item{stopwords}{Extra words to drop, in addition to [biblio_stopwords()].}
+\item{stopwords}{Extra words to drop, in addition to [citelens_stopwords()].}
 
 \item{min_word_length}{Drop words shorter than this many letters.}
 
@@ -54,7 +54,7 @@ number of abstracts in that year) before reading much into a change. Use
 `bin` to group years, for example `bin = 5`.
 }
 \examples{
-f <- system.file("extdata", "sample_abstracts.bib", package = "biblio")
+f <- system.file("extdata", "sample_abstracts.bib", package = "citelens")
 refs <- bib_to_df(f)
 word_trends(refs, words = c("retention", "tuition"), bin = 5)
 }

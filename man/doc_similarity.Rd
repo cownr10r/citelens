@@ -32,12 +32,12 @@ every abstract).}
 
 \item{min_word_length}{Drop words shorter than this many letters.}
 
-\item{stopwords}{Extra words to drop, in addition to [biblio_stopwords()].}
+\item{stopwords}{Extra words to drop, in addition to [citelens_stopwords()].}
 
 \item{singularize}{Merge simple plurals (default `TRUE`).}
 }
 \value{
-An object of class `biblio_similarity`. Use [similar_to()],
+An object of class `citelens_similarity`. Use [similar_to()],
   [find_duplicates()] and [plot_similarity()] to explore it; the matrix itself
   is in `$sim`.
 }
@@ -56,7 +56,7 @@ result stores a full abstract-by-abstract matrix, which is fine for thousands
 of abstracts but grows with the square of their number.
 }
 \examples{
-f <- system.file("extdata", "sample_abstracts.bib", package = "biblio")
+f <- system.file("extdata", "sample_abstracts.bib", package = "citelens")
 refs <- bib_to_df(f)
 s <- doc_similarity(refs)
 similar_to(s, "syn01", n = 3)

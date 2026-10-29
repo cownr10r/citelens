@@ -12,7 +12,7 @@
 
 #include <string>
 
-namespace biblio_ascii {
+namespace citelens_ascii {
 
 inline bool isSpaceA(char c) {
     return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v';
@@ -76,6 +76,6 @@ inline std::string asciiFold(const std::string& s) {
     return out;
 }
 
-}  // namespace biblio_ascii
+}  // namespace citelens_ascii
 
 #endif  // BIBLIO_ASCII_H

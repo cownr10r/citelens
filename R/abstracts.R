@@ -6,17 +6,17 @@
 .OPENALEX_FIELDS <- "id,title,publication_year,doi,abstract_inverted_index"
 
 .http_error <- function(kind, status = NA_integer_) {
-  structure(list(kind = kind, status = status), class = "biblio_http_error")
+  structure(list(kind = kind, status = status), class = "citelens_http_error")
 }
 
 # Download and parse JSON from OpenAlex.
 # Returns the parsed list; list() when the item does not exist (404); or a
-# "biblio_http_error" saying what went wrong: "quota" (429), "key" (409),
+# "citelens_http_error" saying what went wrong: "quota" (429), "key" (409),
 # "auth" (401/403), "server", "network" or "parse". Never contains the URL, so an
 # API key cannot leak into messages.
 .get_json <- function(url, tries = 3) {
   h <- curl::new_handle(timeout = 30)
-  curl::handle_setheaders(h, `User-Agent` = "biblio-R-package", Accept = "application/json")
+  curl::handle_setheaders(h, `User-Agent` = "citelens-R-package", Accept = "application/json")
   wait <- 1
   for (attempt in seq_len(tries)) {
     r <- tryCatch(curl::curl_fetch_memory(url, h), error = function(e) NULL)
@@ -228,7 +228,7 @@ fetch_abstracts <- function(data, title = "title", doi = "doi", year = "year",
   req <- function(url) {
     r <- fetch(url)
     last_failed <<- FALSE
-    if (is.null(r) || inherits(r, "biblio_http_error")) {
+    if (is.null(r) || inherits(r, "citelens_http_error")) {
       last_failed <<- TRUE
       kind <- if (is.null(r)) "network" else r$kind
       if (kind %in% c("quota", "key", "auth")) fatal <<- kind else failures <<- failures + 1L

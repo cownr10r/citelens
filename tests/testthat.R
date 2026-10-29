@@ -1,3 +1,3 @@
 library(testthat)
-library(biblio)
-test_check("biblio")
+library(citelens)
+test_check("citelens")

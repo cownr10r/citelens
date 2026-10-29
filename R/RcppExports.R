@@ -8,7 +8,7 @@
 #' @return A data frame with one row per entry.
 #' @noRd
 bib_parse_cpp <- function(lines, clean) {
-    .Call(`_biblio_bib_parse_cpp`, lines, clean)
+    .Call(`_citelens_bib_parse_cpp`, lines, clean)
 }
 
 #' Collapsed Gibbs sampler for LDA (internal)
@@ -23,7 +23,7 @@ bib_parse_cpp <- function(lines, clean) {
 #' @return List with `phi` (K x V), `theta` (D x K), `loglik` (trace) and `loglik_iter`.
 #' @noRd
 lda_gibbs_cpp <- function(docs, V, K, alpha, beta, n_iter, log_every) {
-    .Call(`_biblio_lda_gibbs_cpp`, docs, V, K, alpha, beta, n_iter, log_every)
+    .Call(`_citelens_lda_gibbs_cpp`, docs, V, K, alpha, beta, n_iter, log_every)
 }
 
 #' Convert RefWorks citations (Tagged Format or RIS) to BibTeX entries
@@ -35,7 +35,7 @@ lda_gibbs_cpp <- function(docs, V, K, alpha, beta, n_iter, log_every) {
 #' @return Character vector with one BibTeX entry per record.
 #' @export
 refworks_to_bib <- function(lines) {
-    .Call(`_biblio_refworks_to_bib`, lines)
+    .Call(`_citelens_refworks_to_bib`, lines)
 }
 
 #' Cosine similarity of sparse document vectors (internal)
@@ -46,6 +46,6 @@ refworks_to_bib <- function(lines) {
 #' @return A D x D numeric matrix of cosine similarities (NA for documents with no weight).
 #' @noRd
 cosine_sparse_cpp <- function(ids, weights, V) {
-    .Call(`_biblio_cosine_sparse_cpp`, ids, weights, V)
+    .Call(`_citelens_cosine_sparse_cpp`, ids, weights, V)
 }
 

@@ -28,6 +28,6 @@ it runs [convert_refworks()] and then [bib_to_df()], so the same cleaning of
 odd characters applies. Optionally it also saves the intermediate BibTeX file.
 }
 \examples{
-ris <- system.file("extdata", "sample_refworks.ris", package = "biblio")
+ris <- system.file("extdata", "sample_refworks.ris", package = "citelens")
 refworks_to_xlsx(ris, tempfile(fileext = ".xlsx"))
 }

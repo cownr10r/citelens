@@ -12,7 +12,7 @@
 #include <utility>
 #include <vector>
 
-using namespace biblio_ascii;
+using namespace citelens_ascii;
 
 namespace {
 

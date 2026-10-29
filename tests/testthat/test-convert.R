@@ -1,4 +1,4 @@
-sample_file <- system.file("extdata", "sample_refworks.txt", package = "biblio")
+sample_file <- system.file("extdata", "sample_refworks.txt", package = "citelens")
 
 test_that("all sample records are converted", {
   out <- convert_refworks(sample_file)
@@ -34,7 +34,7 @@ test_that("bad input is handled", {
 })
 
 test_that("RIS files are detected and converted", {
-  ris <- system.file("extdata", "sample_refworks.ris", package = "biblio")
+  ris <- system.file("extdata", "sample_refworks.ris", package = "citelens")
   out <- convert_refworks(ris)
   expect_length(out, 4)
   expect_match(out[1], "^@article\\{tinto2006research,")

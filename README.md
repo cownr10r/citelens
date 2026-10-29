@@ -1,4 +1,4 @@
-# biblio
+# citelens
 
 Convert citations exported from **RefWorks** into **BibTeX** (`.bib`) files, read
 BibTeX into an **R data frame**, save the result as an **Excel** spreadsheet, and
@@ -11,7 +11,7 @@ even on large libraries.
 
 ```r
 # install.packages("remotes")
-remotes::install_github("cownr10r/biblio")
+remotes::install_github("cownr10r/citelens")
 ```
 
 The C++ code is compiled on your machine when you install, so you need a C++
@@ -48,7 +48,7 @@ compiler:
 | `word_trends(refs, words)` | Share of abstracts mentioning a word, by year or group of years |
 | `topic_trends(model, refs)` | Each topic's share by year or group of years |
 | `plot_word_trends()`, `plot_topic_trends()` | Line charts of the trends |
-| `biblio_stopwords()` | The list of ignored words (add your own with `stopwords = `) |
+| `citelens_stopwords()` | The list of ignored words (add your own with `stopwords = `) |
 
 `convert_refworks()` and `refworks_to_xlsx()` accept both **RefWorks Tagged
 Format** (lines like `RT`, `A1`, `T1`) and **RIS** (lines like `TY  -`, `AU  -`),
@@ -57,7 +57,7 @@ and detect which one you gave them.
 ## Quick start
 
 ```r
-library(biblio)
+library(citelens)
 
 # RefWorks / RIS export -> Excel in one step
 refworks_to_xlsx("~/Downloads/export.ris", "~/Desktop/references.xlsx")
@@ -77,11 +77,11 @@ refs <- bib_to_df("~/Desktop/references.bib", xlsx = "~/Desktop/references.xlsx"
 Sample files are included so you can try it right away:
 
 ```r
-ris <- system.file("extdata", "sample_refworks.ris", package = "biblio")
+ris <- system.file("extdata", "sample_refworks.ris", package = "citelens")
 cat(convert_refworks(ris)[1])
 
 # 30 synthetic abstracts for trying the text analytics
-refs <- bib_to_df(system.file("extdata", "sample_abstracts.bib", package = "biblio"))
+refs <- bib_to_df(system.file("extdata", "sample_abstracts.bib", package = "citelens"))
 ```
 
 ```
@@ -212,7 +212,7 @@ plot(ks)
 Tips: topic models work best with dozens of abstracts or more. Add words that
 carry no meaning for your field with `stopwords = c("student", "college")`, and
 use `max_doc_prop = 0.5` to drop words found in over half the abstracts. A
-sample file lives at `system.file("extdata", "sample_abstracts.bib", package = "biblio")`
+sample file lives at `system.file("extdata", "sample_abstracts.bib", package = "citelens")`
 (synthetic text, for trying things out).
 
 ## Document similarity

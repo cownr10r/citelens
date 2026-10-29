@@ -23,7 +23,7 @@
 #' @return A data frame with one row per BibTeX entry (invisibly when `xlsx`
 #'   is given).
 #' @examples
-#' f <- system.file("extdata", "sample.bib", package = "biblio")
+#' f <- system.file("extdata", "sample.bib", package = "citelens")
 #' bib_to_df(f)
 #'
 #' # Also save an Excel copy

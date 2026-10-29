@@ -49,20 +49,20 @@ refs <- function() {
 }
 
 test_that("abstracts are rebuilt in word order from OpenAlex's inverted index", {
-  expect_equal(biblio:::.rebuild_abstract(idx("to be or not to be")), "to be or not to be")
-  expect_equal(biblio:::.rebuild_abstract(list(world = 1L, hello = 0L)), "hello world")
-  expect_true(is.na(biblio:::.rebuild_abstract(NULL)))
-  expect_true(is.na(biblio:::.rebuild_abstract(list())))
+  expect_equal(citelens:::.rebuild_abstract(idx("to be or not to be")), "to be or not to be")
+  expect_equal(citelens:::.rebuild_abstract(list(world = 1L, hello = 0L)), "hello world")
+  expect_true(is.na(citelens:::.rebuild_abstract(NULL)))
+  expect_true(is.na(citelens:::.rebuild_abstract(list())))
 })
 
 test_that("title similarity and DOI cleaning behave", {
-  expect_equal(biblio:::.title_similarity("Leaving College!", "leaving   college"), 1)
-  expect_lt(biblio:::.title_similarity("Leaving college", "Completely different words"), 0.5)
-  expect_equal(biblio:::.title_similarity("A very long title that goes on and on", "A very long title that goes on and on and then some more words", TRUE), 1)
-  expect_equal(biblio:::.clean_doi("https://doi.org/10.1000/ABC"), "10.1000/ABC")
-  expect_equal(biblio:::.clean_doi("doi:10.1000/x"), "10.1000/x")
-  expect_true(is.na(biblio:::.clean_doi("not a doi")))
-  expect_true(is.na(biblio:::.clean_doi(NA)))
+  expect_equal(citelens:::.title_similarity("Leaving College!", "leaving   college"), 1)
+  expect_lt(citelens:::.title_similarity("Leaving college", "Completely different words"), 0.5)
+  expect_equal(citelens:::.title_similarity("A very long title that goes on and on", "A very long title that goes on and on and then some more words", TRUE), 1)
+  expect_equal(citelens:::.clean_doi("https://doi.org/10.1000/ABC"), "10.1000/ABC")
+  expect_equal(citelens:::.clean_doi("doi:10.1000/x"), "10.1000/x")
+  expect_true(is.na(citelens:::.clean_doi("not a doi")))
+  expect_true(is.na(citelens:::.clean_doi(NA)))
 })
 
 test_that("fetch_abstracts fills matches and leaves uncertain ones NA", {
@@ -134,7 +134,7 @@ test_that("quota / key / auth errors stop the run with a useful message and keep
     calls <- 0
     f <- function(url) {
       calls <<- calls + 1
-      if (calls == 1) make_fetch()(url) else biblio:::.http_error(kind, 429L)
+      if (calls == 1) make_fetch()(url) else citelens:::.http_error(kind, 429L)
     }
     expect_warning(out <- suppressMessages(fetch_abstracts(d, api_key = "k", fetch = f, delay = 0)),
                    switch(kind, quota = "allowance is used up", key = "requires an API key",
@@ -142,7 +142,7 @@ test_that("quota / key / auth errors stop the run with a useful message and keep
     expect_equal(out$abstract[1], "the right abstract about first generation retention")
     expect_equal(calls, 2)                   # stopped at the first refusal, no more requests
   }
-  w <- tryCatch(fetch_abstracts(d, fetch = function(u) biblio:::.http_error("quota", 429L), delay = 0),
+  w <- tryCatch(fetch_abstracts(d, fetch = function(u) citelens:::.http_error("quota", 429L), delay = 0),
                 warning = function(w) conditionMessage(w))
   expect_match(w, "openalex.org/settings/api", fixed = TRUE)
   expect_match(w, "run fetch_abstracts\\(\\) again", perl = TRUE)
@@ -177,7 +177,7 @@ test_that("scholar_html_to_bib(abstracts = TRUE) puts the abstract into the entr
   page <- '<div class="gs_r" data-cid="c1"><div class="gs_ri">
     <h3 class="gs_rt"><a href="https://example.org/a">Retention of first-generation students</a></h3>
     <div class="gs_a">A Smith - Journal of Examples, 2018 - Example Press</div></div></div>'
-  testthat::local_mocked_bindings(.get_json = make_fetch(), .package = "biblio")
+  testthat::local_mocked_bindings(.get_json = make_fetch(), .package = "citelens")
   b <- suppressMessages(scholar_html_to_bib(page, abstracts = TRUE))
   expect_match(b, "abstract +=  *\\{the right abstract about first generation retention\\}")
   b0 <- suppressMessages(scholar_html_to_bib(page))
@@ -227,10 +227,10 @@ test_that("a title cut short at the start, the end, or both still matches the fu
   full <- "An Understanding of the Improved Grades, Retention and Graduation Rates of STEM Majors at the Academic Investment in Math and Science (AIMS) Program of Bowling Green State University (BGSU)"
   both <- paste0(el, " improved grades, retention and graduation rates of STEM majors at the Academic Investment in Math and Science (AIMS) Program of Bowling Green State University ", el)
   start <- paste0(el, " retention and graduation rates of STEM majors at the Academic Investment in Math and Science (AIMS) Program")
-  expect_gte(biblio:::.title_similarity(both, full, TRUE), 0.95)
-  expect_gte(biblio:::.title_similarity(start, full, TRUE), 0.9)
-  expect_lt(biblio:::.title_similarity(both, full, FALSE), 0.85)       # without the flag it is a poor match
-  expect_lt(biblio:::.title_similarity("improved grades in something else entirely here", full, TRUE), 0.7)
+  expect_gte(citelens:::.title_similarity(both, full, TRUE), 0.95)
+  expect_gte(citelens:::.title_similarity(start, full, TRUE), 0.9)
+  expect_lt(citelens:::.title_similarity(both, full, FALSE), 0.85)       # without the flag it is a poor match
+  expect_lt(citelens:::.title_similarity("improved grades in something else entirely here", full, TRUE), 0.7)
   f <- function(url) list(results = list(work("W77", full, 2012, "the BGSU abstract")))
   d <- data.frame(title = both, year = 2012L, stringsAsFactors = FALSE)
   out <- suppressMessages(fetch_abstracts(d, api_key = "k", fetch = f, delay = 0))

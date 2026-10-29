@@ -36,7 +36,7 @@ expanded, `#` concatenation is handled, and `@comment` / `@preamble` blocks are
 ignored.
 }
 \examples{
-f <- system.file("extdata", "sample.bib", package = "biblio")
+f <- system.file("extdata", "sample.bib", package = "citelens")
 bib_to_df(f)
 
 # Also save an Excel copy

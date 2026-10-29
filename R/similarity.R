@@ -15,11 +15,11 @@
 #' @inheritParams topic_model
 #' @param min_doc_freq Drop words that occur in fewer than this many abstracts.
 #'   The default of 2 ignores words that cannot link two abstracts.
-#' @return An object of class `biblio_similarity`. Use [similar_to()],
+#' @return An object of class `citelens_similarity`. Use [similar_to()],
 #'   [find_duplicates()] and [plot_similarity()] to explore it; the matrix itself
 #'   is in `$sim`.
 #' @examples
-#' f <- system.file("extdata", "sample_abstracts.bib", package = "biblio")
+#' f <- system.file("extdata", "sample_abstracts.bib", package = "citelens")
 #' refs <- bib_to_df(f)
 #' s <- doc_similarity(refs)
 #' similar_to(s, "syn01", n = 3)
@@ -39,7 +39,7 @@ doc_similarity <- function(data, text = "abstract", id = "bibkey", min_doc_freq 
   rows <- which(has_text)
   ids <- if (id %in% names(data)) as.character(data[[id]]) else as.character(seq_len(nrow(data)))
 
-  sw <- unique(c(.biblio_stopwords, tolower(stopwords)))
+  sw <- unique(c(.citelens_stopwords, tolower(stopwords)))
   tokens <- .tokenize(raw[rows], sw, min_word_length, isTRUE(singularize))
 
   n_all <- length(tokens)
@@ -78,21 +78,21 @@ doc_similarity <- function(data, text = "abstract", id = "bibkey", min_doc_freq 
   structure(
     list(sim = sim, doc_ids = ids[rows], doc_rows = rows, n_rows = nrow(data),
          vocab = vocab),
-    class = "biblio_similarity"
+    class = "citelens_similarity"
   )
 }
 
 .check_sim <- function(s) {
-  if (!inherits(s, "biblio_similarity")) {
+  if (!inherits(s, "citelens_similarity")) {
     stop("`s` must be the result of doc_similarity().", call. = FALSE)
   }
 }
 
 #' @export
-print.biblio_similarity <- function(x, ...) {
+print.citelens_similarity <- function(x, ...) {
   n <- length(x$doc_ids)
   off <- x$sim[upper.tri(x$sim)]
-  cat("<biblio document similarity>\n")
+  cat("<citelens document similarity>\n")
   cat(n, " abstracts, ", length(x$vocab), " distinct words\n", sep = "")
   cat("pairwise cosine similarity: median ", format(round(stats::median(off), 3)),
       ", 90th percentile ", format(round(unname(stats::quantile(off, 0.9)), 3)),
@@ -102,7 +102,7 @@ print.biblio_similarity <- function(x, ...) {
 }
 
 #' @export
-plot.biblio_similarity <- function(x, ...) plot_similarity(x, ...)
+plot.citelens_similarity <- function(x, ...) plot_similarity(x, ...)
 
 #' Abstracts most similar to a given one
 #'
@@ -247,7 +247,7 @@ plot_similarity <- function(s, order = TRUE, labels = length(s$doc_ids) <= 40,
 #'   reference. For `"pairs"`: `id_1`, `id_2`, `similarity` (plus `title_1`,
 #'   `title_2`).
 #' @examples
-#' f <- system.file("extdata", "sample_abstracts.bib", package = "biblio")
+#' f <- system.file("extdata", "sample_abstracts.bib", package = "citelens")
 #' refs <- bib_to_df(f)
 #' s <- doc_similarity(refs)
 #' head(similarity_to_df(s, "pairs", data = refs), 3)
@@ -307,7 +307,7 @@ similarity_to_df <- function(s, type = c("matrix", "pairs"), data = NULL, title 
 }
 
 #' @export
-as.data.frame.biblio_similarity <- function(x, row.names = NULL, optional = FALSE,
+as.data.frame.citelens_similarity <- function(x, row.names = NULL, optional = FALSE,
                                             type = "pairs", ...) {
   similarity_to_df(x, type = type, ...)
 }

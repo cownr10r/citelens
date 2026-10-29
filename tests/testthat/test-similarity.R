@@ -1,5 +1,5 @@
 sample_refs <- function() {
-  bib_to_df(system.file("extdata", "sample_abstracts.bib", package = "biblio"))
+  bib_to_df(system.file("extdata", "sample_abstracts.bib", package = "citelens"))
 }
 
 toy <- function() {

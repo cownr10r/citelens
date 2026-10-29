@@ -1,11 +1,11 @@
 sample_refs <- function() {
-  bib_to_df(system.file("extdata", "sample_abstracts.bib", package = "biblio"))
+  bib_to_df(system.file("extdata", "sample_abstracts.bib", package = "citelens"))
 }
 
 test_that("topic_model recovers the three synthetic themes", {
   refs <- sample_refs()
   m <- suppressMessages(topic_model(refs, k = 3, n_iter = 300, seed = 1))
-  expect_s3_class(m, "biblio_topics")
+  expect_s3_class(m, "citelens_topics")
   expect_equal(dim(m$theta), c(30, 3))
   expect_equal(unname(rowSums(m$theta)), rep(1, 30), tolerance = 1e-8)
   expect_equal(unname(rowSums(m$phi)), rep(1, 3), tolerance = 1e-8)
@@ -38,7 +38,7 @@ test_that("result helpers return tidy data frames", {
   joined <- topic_documents(m, refs)
   expect_equal(nrow(joined), 30)
   expect_true(all(c("bibkey", "dominant_topic", "topic_1") %in% names(joined)))
-  expect_output(print(m), "biblio topic model")
+  expect_output(print(m), "citelens topic model")
 })
 
 test_that("rows without an abstract get NA when joined back", {
@@ -73,6 +73,6 @@ test_that("bad input gives clear errors", {
 })
 
 test_that("tokenizer handles accents, apostrophes and plurals", {
-  tk <- biblio:::.tokenize("Students\u2019 \u00e9tude on the college\u2019s retention, 2020!", c("the", "on"), 3, TRUE)[[1]]
+  tk <- citelens:::.tokenize("Students\u2019 \u00e9tude on the college\u2019s retention, 2020!", c("the", "on"), 3, TRUE)[[1]]
   expect_equal(tk, c("student", "\u00e9tude", "college", "retention"))
 })

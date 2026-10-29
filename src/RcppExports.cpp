@@ -12,7 +12,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 
 // bib_parse_cpp
 Rcpp::List bib_parse_cpp(Rcpp::CharacterVector lines, bool clean);
-RcppExport SEXP _biblio_bib_parse_cpp(SEXP linesSEXP, SEXP cleanSEXP) {
+RcppExport SEXP _citelens_bib_parse_cpp(SEXP linesSEXP, SEXP cleanSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -24,7 +24,7 @@ END_RCPP
 }
 // lda_gibbs_cpp
 Rcpp::List lda_gibbs_cpp(Rcpp::List docs, int V, int K, double alpha, double beta, int n_iter, int log_every);
-RcppExport SEXP _biblio_lda_gibbs_cpp(SEXP docsSEXP, SEXP VSEXP, SEXP KSEXP, SEXP alphaSEXP, SEXP betaSEXP, SEXP n_iterSEXP, SEXP log_everySEXP) {
+RcppExport SEXP _citelens_lda_gibbs_cpp(SEXP docsSEXP, SEXP VSEXP, SEXP KSEXP, SEXP alphaSEXP, SEXP betaSEXP, SEXP n_iterSEXP, SEXP log_everySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -41,7 +41,7 @@ END_RCPP
 }
 // refworks_to_bib
 Rcpp::CharacterVector refworks_to_bib(Rcpp::CharacterVector lines);
-RcppExport SEXP _biblio_refworks_to_bib(SEXP linesSEXP) {
+RcppExport SEXP _citelens_refworks_to_bib(SEXP linesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -52,7 +52,7 @@ END_RCPP
 }
 // cosine_sparse_cpp
 Rcpp::NumericMatrix cosine_sparse_cpp(Rcpp::List ids, Rcpp::List weights, int V);
-RcppExport SEXP _biblio_cosine_sparse_cpp(SEXP idsSEXP, SEXP weightsSEXP, SEXP VSEXP) {
+RcppExport SEXP _citelens_cosine_sparse_cpp(SEXP idsSEXP, SEXP weightsSEXP, SEXP VSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -65,14 +65,14 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_biblio_bib_parse_cpp", (DL_FUNC) &_biblio_bib_parse_cpp, 2},
-    {"_biblio_lda_gibbs_cpp", (DL_FUNC) &_biblio_lda_gibbs_cpp, 7},
-    {"_biblio_refworks_to_bib", (DL_FUNC) &_biblio_refworks_to_bib, 1},
-    {"_biblio_cosine_sparse_cpp", (DL_FUNC) &_biblio_cosine_sparse_cpp, 3},
+    {"_citelens_bib_parse_cpp", (DL_FUNC) &_citelens_bib_parse_cpp, 2},
+    {"_citelens_lda_gibbs_cpp", (DL_FUNC) &_citelens_lda_gibbs_cpp, 7},
+    {"_citelens_refworks_to_bib", (DL_FUNC) &_citelens_refworks_to_bib, 1},
+    {"_citelens_cosine_sparse_cpp", (DL_FUNC) &_citelens_cosine_sparse_cpp, 3},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_biblio(DllInfo *dll) {
+RcppExport void R_init_citelens(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

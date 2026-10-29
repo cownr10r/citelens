@@ -22,6 +22,6 @@ RIS format (detected automatically) and converts them to BibTeX entries
 using compiled C++ code.
 }
 \examples{
-f <- system.file("extdata", "sample_refworks.txt", package = "biblio")
+f <- system.file("extdata", "sample_refworks.txt", package = "citelens")
 cat(convert_refworks(f)[1])
 }

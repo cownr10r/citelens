@@ -63,7 +63,7 @@ NULL
 }
 
 .check_model <- function(model) {
-  if (!inherits(model, "biblio_topics")) {
+  if (!inherits(model, "citelens_topics")) {
     stop("`model` must be the result of topic_model().", call. = FALSE)
   }
 }
@@ -86,7 +86,7 @@ NULL
 #' uses a collapsed Gibbs sampler written in C++.
 #'
 #' Text is lower-cased, punctuation and numbers are removed, stop words (see
-#' [biblio_stopwords()]) and very short words are dropped, and simple plurals are
+#' [citelens_stopwords()]) and very short words are dropped, and simple plurals are
 #' merged (students and student count as one word). Words that occur in fewer
 #' than `min_doc_freq` abstracts are ignored.
 #'
@@ -110,17 +110,17 @@ NULL
 #'   abstracts (1 keeps everything; try 0.5 to remove words common to nearly
 #'   every abstract).
 #' @param min_word_length Drop words shorter than this many letters.
-#' @param stopwords Extra words to drop, in addition to [biblio_stopwords()].
+#' @param stopwords Extra words to drop, in addition to [citelens_stopwords()].
 #' @param singularize Merge simple plurals (default `TRUE`).
 #' @param seed Optional number passed to [set.seed()] so the fit can be
 #'   reproduced.
 #'
-#' @return An object of class `biblio_topics`. Use [topic_terms()],
+#' @return An object of class `citelens_topics`. Use [topic_terms()],
 #'   [topic_documents()], [topic_summary()], [plot_topic_terms()] and
 #'   [plot_topic_prevalence()] to explore it. Topics are numbered from the most
 #'   to the least prevalent.
 #' @examples
-#' f <- system.file("extdata", "sample_abstracts.bib", package = "biblio")
+#' f <- system.file("extdata", "sample_abstracts.bib", package = "citelens")
 #' refs <- bib_to_df(f)
 #' filler <- c("note", "time", "follow", "shape", "touch", "studied", "evidence",
 #'             "work", "attention", "discussion")   # words from the synthetic sample
@@ -150,7 +150,7 @@ topic_model <- function(data, k = 5, text = "abstract", id = "bibkey",
   rows <- which(has_text)
   ids <- if (id %in% names(data)) as.character(data[[id]]) else as.character(seq_len(nrow(data)))
 
-  sw <- unique(c(.biblio_stopwords, tolower(stopwords)))
+  sw <- unique(c(.citelens_stopwords, tolower(stopwords)))
   tokens <- .tokenize(raw[rows], sw, min_word_length, isTRUE(singularize))
 
   n_all <- length(tokens)
@@ -201,13 +201,13 @@ topic_model <- function(data, k = 5, text = "abstract", id = "bibkey",
       loglik = data.frame(iteration = fit$loglik_iter, loglik = fit$loglik),
       coherence = .coherence(phi, word_ids)
     ),
-    class = "biblio_topics"
+    class = "citelens_topics"
   )
 }
 
 #' @export
-print.biblio_topics <- function(x, ...) {
-  cat("<biblio topic model>\n")
+print.citelens_topics <- function(x, ...) {
+  cat("<citelens topic model>\n")
   cat(x$k, " topics from ", length(x$doc_ids), " abstracts (", length(x$vocab),
       " distinct words, ", sum(x$doc_lengths), " word occurrences)\n", sep = "")
   cat("alpha = ", format(x$alpha, digits = 3), ", beta = ", x$beta,
@@ -220,7 +220,7 @@ print.biblio_topics <- function(x, ...) {
 }
 
 #' @export
-plot.biblio_topics <- function(x, ...) plot_topic_terms(x, ...)
+plot.citelens_topics <- function(x, ...) plot_topic_terms(x, ...)
 
 # ---------------------------------------------------------------------------
 # Results as data frames
@@ -375,7 +375,7 @@ plot_topic_prevalence <- function(model, n_terms = 4) {
 #' @return A data frame with `k`, `mean_coherence` and `loglik`; it has a
 #'   `plot()` method.
 #' @examples
-#' f <- system.file("extdata", "sample_abstracts.bib", package = "biblio")
+#' f <- system.file("extdata", "sample_abstracts.bib", package = "citelens")
 #' topic_k_search(bib_to_df(f), k = 2:4, n_iter = 200, seed = 1)
 #' @export
 topic_k_search <- function(data, k = 2:8, ...) {
@@ -385,12 +385,12 @@ topic_k_search <- function(data, k = 2:8, ...) {
                loglik = m$loglik$loglik[nrow(m$loglik)])
   })
   out <- do.call(rbind, rows)
-  class(out) <- c("biblio_k_search", "data.frame")
+  class(out) <- c("citelens_k_search", "data.frame")
   out
 }
 
 #' @export
-plot.biblio_k_search <- function(x, ...) {
+plot.citelens_k_search <- function(x, ...) {
   ggplot2::ggplot(as.data.frame(x), ggplot2::aes(x = .data$k, y = .data$mean_coherence)) +
     ggplot2::geom_line(colour = "#2b6cb0") +
     ggplot2::geom_point(size = 2.5, colour = "#2b6cb0") +

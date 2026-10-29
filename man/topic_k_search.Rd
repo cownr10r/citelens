@@ -25,6 +25,6 @@ Look for the `k` where coherence is best or stops improving, then read the
 topics to see whether they make sense. This is a guide, not a verdict.
 }
 \examples{
-f <- system.file("extdata", "sample_abstracts.bib", package = "biblio")
+f <- system.file("extdata", "sample_abstracts.bib", package = "citelens")
 topic_k_search(bib_to_df(f), k = 2:4, n_iter = 200, seed = 1)
 }

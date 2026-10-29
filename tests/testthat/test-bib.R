@@ -1,4 +1,4 @@
-sample_bib <- system.file("extdata", "sample.bib", package = "biblio")
+sample_bib <- system.file("extdata", "sample.bib", package = "citelens")
 
 test_that("entries are parsed into rows with type and key", {
   df <- bib_to_df(sample_bib)
@@ -39,7 +39,7 @@ test_that("missing fields are NA and parentheses/quotes delimiters work", {
 })
 
 test_that("round trip: RefWorks -> .bib -> data frame", {
-  rw  <- system.file("extdata", "sample_refworks.txt", package = "biblio")
+  rw  <- system.file("extdata", "sample_refworks.txt", package = "citelens")
   tmp <- tempfile(fileext = ".bib")
   suppressMessages(convert_refworks(rw, tmp))
   df <- bib_to_df(tmp)

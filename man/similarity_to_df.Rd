@@ -54,7 +54,7 @@ If you give `xlsx`, an Excel workbook is written with **both** layouts, on
 sheets named `similarity_matrix` and `pairs`, whichever `type` you asked for.
 }
 \examples{
-f <- system.file("extdata", "sample_abstracts.bib", package = "biblio")
+f <- system.file("extdata", "sample_abstracts.bib", package = "citelens")
 refs <- bib_to_df(f)
 s <- doc_similarity(refs)
 head(similarity_to_df(s, "pairs", data = refs), 3)

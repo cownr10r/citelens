@@ -1,4 +1,4 @@
-.biblio_stopwords <- c(
+.citelens_stopwords <- c(
   # common English function words
   "a", "about", "above", "after", "again", "against", "all", "also", "although", "am", "among",
   "an", "and", "any", "are", "as", "at", "be", "because", "been", "before", "being", "below",
@@ -34,6 +34,6 @@
 #'
 #' @return A character vector.
 #' @examples
-#' head(biblio_stopwords())
+#' head(citelens_stopwords())
 #' @export
-biblio_stopwords <- function() .biblio_stopwords
+citelens_stopwords <- function() .citelens_stopwords

@@ -1,6 +1,6 @@
 #' @keywords internal
 "_PACKAGE"
 
-#' @useDynLib biblio, .registration = TRUE
+#' @useDynLib citelens, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 NULL

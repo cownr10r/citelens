@@ -15,7 +15,7 @@
 #'
 #' @return The data frame of references, invisibly.
 #' @examples
-#' ris <- system.file("extdata", "sample_refworks.ris", package = "biblio")
+#' ris <- system.file("extdata", "sample_refworks.ris", package = "citelens")
 #' refworks_to_xlsx(ris, tempfile(fileext = ".xlsx"))
 #' @export
 refworks_to_xlsx <- function(input, xlsx, bib = NULL, clean = TRUE) {

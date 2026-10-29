@@ -11,7 +11,7 @@ toy <- function() {
 }
 
 test_that("years are parsed from messy text", {
-  expect_equal(biblio:::.parse_year(c("2019", "Spring 2020", "2018/03", NA, "n.d.")),
+  expect_equal(citelens:::.parse_year(c("2019", "Spring 2020", "2018/03", NA, "n.d.")),
                c(2019L, 2020L, 2018L, NA, NA))
 })
 
@@ -43,7 +43,7 @@ test_that("bin groups years", {
 })
 
 test_that("topic_trends gives shares that add to 1 per period", {
-  refs <- bib_to_df(system.file("extdata", "sample_abstracts.bib", package = "biblio"))
+  refs <- bib_to_df(system.file("extdata", "sample_abstracts.bib", package = "citelens"))
   m <- suppressMessages(topic_model(refs, k = 3, n_iter = 100, seed = 1))
   tt <- topic_trends(m, refs, bin = 5)
   expect_equal(names(tt), c("period", "topic", "label", "share", "n_period"))
@@ -54,7 +54,7 @@ test_that("topic_trends gives shares that add to 1 per period", {
 })
 
 test_that("charts are ggplot objects and bad input errors clearly", {
-  refs <- bib_to_df(system.file("extdata", "sample_abstracts.bib", package = "biblio"))
+  refs <- bib_to_df(system.file("extdata", "sample_abstracts.bib", package = "citelens"))
   w <- word_trends(refs, words = c("retention", "tuition"), bin = 5)
   expect_s3_class(plot_word_trends(w), "ggplot")
   m <- suppressMessages(topic_model(refs, k = 3, n_iter = 50, seed = 1))

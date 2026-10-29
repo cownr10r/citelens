@@ -1,5 +1,5 @@
-ris <- system.file("extdata", "sample_refworks.ris", package = "biblio")
-tag <- system.file("extdata", "sample_refworks.txt", package = "biblio")
+ris <- system.file("extdata", "sample_refworks.ris", package = "citelens")
+tag <- system.file("extdata", "sample_refworks.txt", package = "citelens")
 
 test_that("RIS goes straight to an Excel file", {
   skip_if_not_installed("readxl")
