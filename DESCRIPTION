@@ -1,10 +1,15 @@
 Package: biblio
 Type: Package
-Title: Convert RefWorks Citations to BibTeX
+Title: Tools for Citation Libraries and Text Analytics on Abstracts
 Version: 0.1.0
 Authors@R: person("Mario", "Martinez", email = "mario.a.martinez@live.com", role = c("aut", "cre"))
-Description: Converts citations exported from RefWorks in Tagged Format into
-    BibTeX (.bib) entries. The conversion is implemented in C++ via Rcpp.
+Description: Description: Converts RefWorks and RIS exports, and saved Google Scholar results
+    pages, to BibTeX, and reads BibTeX into data frames and Excel files. Looks up
+    missing abstracts in OpenAlex. Runs text analytics on abstracts: topic modeling
+    (LDA), cosine document similarity, and trends over time. Heavy computation is
+    implemented in C++ via Rcpp.
+URL: https://github.com/cownr10r/biblio
+BugReports: https://github.com/cownr10r/biblio/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 Imports: Rcpp, writexl, ggplot2, xml2, jsonlite, curl
