@@ -1,8 +1,10 @@
 # biblio
 
 Convert citations exported from **RefWorks** into **BibTeX** (`.bib`) files, read
-BibTeX into an **R data frame**, and save the result as an **Excel** spreadsheet.
-The parsing is written in C++ (via [Rcpp](https://www.rcpp.org/)), so it is fast
+BibTeX into an **R data frame**, save the result as an **Excel** spreadsheet, and
+run **text analytics on the abstracts**: topic modeling, document similarity
+(including duplicate finding), and trends over time. The parsing and the heavy
+calculations are written in C++ (via [Rcpp](https://www.rcpp.org/)), so it is fast
 even on large libraries.
 
 ## Installation
@@ -21,11 +23,28 @@ compiler:
 
 ## What it does
 
+**Convert and load references**
+
 | Function | Purpose |
 |---|---|
 | `refworks_to_xlsx(input, xlsx)` | One step: RefWorks export to an Excel file (optionally saves a `.bib` too) |
 | `convert_refworks(input, output)` | RefWorks export to BibTeX entries / a `.bib` file |
 | `bib_to_df(input, xlsx = NULL)` | BibTeX file to a data frame (optionally also an Excel file) |
+
+**Text analytics on abstracts** (these work on the data frame from `bib_to_df()`)
+
+| Function | Purpose |
+|---|---|
+| `topic_model(refs, k)` | Find `k` topics in the abstracts (LDA) |
+| `topic_terms()`, `topic_summary()`, `topic_documents()` | Top words per topic, a one-row-per-topic summary, and each abstract's topic added to your table |
+| `plot_topic_terms()`, `plot_topic_prevalence()` | Charts of a topic model |
+| `topic_k_search(refs, k = 2:8)` | Compare numbers of topics to help choose `k` |
+| `doc_similarity(refs)` | Cosine similarity between every pair of abstracts |
+| `similar_to()`, `find_duplicates()`, `plot_similarity()` | Closest matches to one paper, likely duplicate entries, and a heatmap with the numbers in each box |
+| `word_trends(refs, words)` | Share of abstracts mentioning a word, by year or group of years |
+| `topic_trends(model, refs)` | Each topic's share by year or group of years |
+| `plot_word_trends()`, `plot_topic_trends()` | Line charts of the trends |
+| `biblio_stopwords()` | The list of ignored words (add your own with `stopwords = `) |
 
 `convert_refworks()` and `refworks_to_xlsx()` accept both **RefWorks Tagged
 Format** (lines like `RT`, `A1`, `T1`) and **RIS** (lines like `TY  -`, `AU  -`),
@@ -56,6 +75,9 @@ Sample files are included so you can try it right away:
 ```r
 ris <- system.file("extdata", "sample_refworks.ris", package = "biblio")
 cat(convert_refworks(ris)[1])
+
+# 30 synthetic abstracts for trying the text analytics
+refs <- bib_to_df(system.file("extdata", "sample_abstracts.bib", package = "biblio"))
 ```
 
 ```
@@ -154,6 +176,17 @@ abstracts in each period: periods with only a few abstracts give jumpy shares.
 - **Odd characters:** files saved with Windows-1252 curly quotes or containing
   hidden control characters are repaired when read, so the Excel output always
   opens cleanly.
+- **Text analytics need an `abstract` column** (and a `year` column for the
+  trend functions). If your column has another name, pass it with `text = "..."`
+  or `year = "..."`. References with no abstract are skipped, and you are told how
+  many.
+- **Text cleaning for the analytics:** words are lower-cased, punctuation and
+  numbers are removed, common English words and abstract boilerplate ("study",
+  "results", ...) are dropped, and simple plurals are merged ("student" and
+  "students" count as one).
+- **Small collections:** topic models and trends are most reliable with dozens of
+  abstracts or more. The functions warn when you have very few.
+- **Charts** use ggplot2, which is installed with the package.
 - **BibTeX features supported when reading:** `@string` macros, month names,
   `#` concatenation, `{...}`, `"..."` and `(...)` delimiters; `@comment` and
   `@preamble` blocks are ignored.
