@@ -17,4 +17,4 @@ Imports: Rcpp, writexl, ggplot2, xml2, jsonlite, curl
 LinkingTo: Rcpp
 Suggests: readxl, testthat (>= 3.0.0), withr
 Config/testthat/edition: 3
-RoxygenNote: 7.3.2
+Config/roxygen2/version: 8.1.1

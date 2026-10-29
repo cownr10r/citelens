@@ -19,5 +19,10 @@ Useful links:
 \author{
 \strong{Maintainer}: Mario Martinez \email{mario.a.martinez@live.com} [copyright holder]
 
+Authors:
+\itemize{
+  \item Mario Martinez \email{mario.a.martinez@live.com} [copyright holder]
+}
+
 }
 \keyword{internal}
