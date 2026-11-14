@@ -7,11 +7,12 @@ run **text analytics on the abstracts**: topic modeling, document similarity
 calculations are written in C++ (via [Rcpp](https://www.rcpp.org/)), so it is fast
 even on large libraries.
 
+[![CRAN status](https://www.r-pkg.org/badges/version/citelens)](https://CRAN.R-project.org/package=citelens)
+
 ## Installation
 
 ```r
-# install.packages("remotes")
-remotes::install_github("cownr10r/citelens")
+# install.packages("citelens")
 ```
 
 The C++ code is compiled on your machine when you install, so you need a C++
