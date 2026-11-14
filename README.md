@@ -295,9 +295,8 @@ abstracts in each period: periods with only a few abstracts give jumpy shares.
 ## Development
 
 ```r
-devtools::load_all()   # compile and load
-devtools::test()       # run the tests
-devtools::check()      # full package check
+# install.packages("remotes")
+# remotes::install_github("cownr10r/citelens")
 ```
 
 ## License
