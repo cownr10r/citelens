@@ -5,3 +5,8 @@
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
 ^\.Rhistory$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^doc$
+^Meta$

@@ -1,0 +1,405 @@
+---
+title: "Getting started with citelens"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with citelens}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6.5,
+  fig.height = 4
+)
+```
+
+## Introduction
+
+Bibliometric software often assumes that you can export records from a
+subscription database such as Scopus or Web of Science. Many students,
+institutional researchers, and small teams cannot. What they do have is a
+reference-manager library (RefWorks, or anything that exports RIS), a set of
+Google Scholar searches, or a BibTeX file collected by hand.
+
+`citelens` is a workaround for that situation. It takes the records you *can*
+get and turns them into analysis-ready data frames, then runs text analytics on
+the abstracts. It does four things:
+
+1. **Converts** RefWorks and RIS exports, and saved Google Scholar results
+   pages, to BibTeX.
+2. **Reads** BibTeX into a data frame or an Excel workbook.
+3. **Fills in** missing abstracts by looking them up in
+   [OpenAlex](https://openalex.org), a free scholarly index.
+4. **Analyzes** abstracts: topic modeling (latent Dirichlet allocation),
+   cosine document similarity with duplicate finding, and trends over time.
+
+The parsing and the computationally heavy steps are written in C++ through
+`Rcpp`, so the package stays fast on large libraries.
+
+`citelens` does not try to replace general-purpose tools. If you can already
+export from a major database, or you want a full science-mapping toolkit
+(co-citation networks, collaboration maps, and so on), packages such as
+`bibliometrix` and `openalexR` are built for that. `citelens` is for the earlier
+steps of getting a messy library into shape, and for abstract-level text
+analysis that does not need a paid database.
+
+## Installation
+
+```{r install, eval = FALSE}
+install.packages("citelens")
+```
+
+The C++ code is compiled when you install, so you need a C++ compiler: the
+Xcode command line tools on macOS, Rtools on Windows, or `build-essential` (or
+your distribution's equivalent) on Linux.
+
+```{r load}
+library(citelens)
+```
+
+## Sample data
+
+The package ships with small sample files so that every example below can be
+run as is.
+
+```{r sample-files}
+list.files(system.file("extdata", package = "citelens"))
+```
+
+* `sample_refworks.ris` and `sample_refworks.txt`: a few references in RIS and
+  RefWorks Tagged Format.
+* `sample.bib`: the same references as BibTeX.
+* `sample_abstracts.bib`: 30 *synthetic* abstracts for trying the text
+  analytics. The text is made up, so the results are for illustration only.
+
+## Converting a RefWorks or RIS export
+
+`convert_refworks()` reads a RefWorks export and returns BibTeX entries. It
+accepts both **RefWorks Tagged Format** (lines such as `RT`, `A1`, `T1`) and
+**RIS** (lines such as `TY  -`, `AU  -`), and detects which one you supplied.
+
+```{r convert}
+ris <- system.file("extdata", "sample_refworks.ris", package = "citelens")
+entries <- convert_refworks(ris)
+cat(entries[1])
+```
+
+Citation keys are built from the first author, the year, and the first
+meaningful word of the title (for example `tinto2006research`). A letter is
+added when two keys would otherwise collide. Reference types are mapped to
+BibTeX types (journal article to `article`, book chapter to `incollection`,
+thesis to `phdthesis`, and so on); anything unrecognized becomes `misc`.
+
+To write a `.bib` file, give `convert_refworks()` an output path:
+
+```{r convert-file}
+bib_file <- tempfile(fileext = ".bib")
+convert_refworks(ris, bib_file)
+file.exists(bib_file)
+```
+
+### From RefWorks straight to Excel
+
+If a spreadsheet is what you need, `refworks_to_xlsx()` does the whole job in
+one step. It can also keep the BibTeX copy.
+
+```{r refworks-xlsx}
+xlsx_file <- tempfile(fileext = ".xlsx")
+refs <- refworks_to_xlsx(ris, xlsx_file, bib = tempfile(fileext = ".bib"))
+file.exists(xlsx_file)
+```
+
+The data frame is returned invisibly, so you can keep working with it in R.
+
+## Reading BibTeX into a data frame
+
+`bib_to_df()` reads any BibTeX file, whether it came from `convert_refworks()`,
+Google Scholar's **Cite > BibTeX** option, or another tool.
+
+```{r bib-to-df}
+refs <- bib_to_df(system.file("extdata", "sample.bib", package = "citelens"))
+refs[, c("bibtype", "bibkey", "year", "title")]
+```
+
+The result has one row per entry. `bibtype` and `bibkey` come first, followed by
+one column for every BibTeX field found in the file. Fields an entry does not
+have are `NA`, and every column is character, so convert `year` with
+`as.integer()` if you need to do arithmetic on it.
+
+By default the values are cleaned: grouping braces are removed (`{{Title}}`
+becomes `Title`), escapes such as `\&` are undone, and extra whitespace is
+collapsed. Use `clean = FALSE` for the raw values. Files saved with Windows-1252
+curly quotes or hidden control characters are repaired as they are read, so the
+Excel output opens cleanly.
+
+You can also save a workbook while reading:
+
+```{r bib-to-xlsx, eval = FALSE}
+refs <- bib_to_df("references.bib", xlsx = "references.xlsx")
+```
+
+## Google Scholar results
+
+Google Scholar has no public API and blocks automated requests, so `citelens`
+never contacts it. Instead, you save a results page from your browser
+(**File > Save Page As**, then "Webpage, HTML Only") and let the package read the
+saved file.
+
+```{r scholar, eval = FALSE}
+# one page
+res <- scholar_parse_html("~/Downloads/scholar_page1.html")
+
+# a whole folder: every .html file is read and combined
+res <- scholar_parse_html("~/Documents/scholar_pages")
+
+# include subfolders
+res <- scholar_parse_html("~/Documents/scholar_pages", recursive = TRUE)
+
+# straight to BibTeX; repeated results are removed
+scholar_html_to_bib("~/Documents/scholar_pages", "scholar.bib")
+```
+
+Files in the folder that are not Scholar results pages are skipped with a
+warning that names them. The `source_file` column shows which file each result
+came from.
+
+A results list is a summary, not a full record. It gives title, authors, venue,
+year, publisher, and link, but it shortens long author lists and venue names
+with "...", and it has no volume, pages, DOI, or abstract. Shortened entries are
+flagged (a `note` field in the BibTeX; `authors_truncated` and `venue_truncated`
+columns in the data frame) so you can find them. When you need complete records,
+use Scholar's **Cite > BibTeX**, or its **RefWorks / RefMan** exports, which
+`bib_to_df()` and `convert_refworks()` read directly.
+
+## Looking up missing abstracts in OpenAlex
+
+Text analytics need abstracts, and Scholar's results list has none.
+`fetch_abstracts()` looks them up in OpenAlex, by DOI when you have one and by
+title otherwise.
+
+OpenAlex requires a free API key:
+
+1. Create a free account at <https://openalex.org>.
+2. Copy your key from <https://openalex.org/settings/api>.
+3. Save it once in R. It is picked up automatically afterward.
+
+```{r api-key, eval = FALSE}
+Sys.setenv(OPENALEX_API_KEY = "your-key")   # this session only
+# To keep it permanently, add OPENALEX_API_KEY=your-key to your .Renviron file.
+```
+
+The examples below send requests over the internet, so they are not run when
+this vignette is built.
+
+```{r fetch, eval = FALSE}
+res <- scholar_parse_html("~/Downloads/scholar_page1.html")
+res <- fetch_abstracts(res)          # or fetch_abstracts(res, api_key = "your-key")
+
+# the same, but straight to BibTeX with abstracts included
+scholar_html_to_bib("scholar_page1.html", "scholar.bib", abstracts = TRUE)
+```
+
+`fetch_abstracts()` also works on a `bib_to_df()` table that has DOIs.
+
+**What is sent.** Each title (or DOI) and your key are sent to OpenAlex, and
+nothing else.
+
+**Being careful about matches.** A title match is accepted only when the titles
+are very close *and* the publication years agree to within a year. Otherwise the
+abstract stays `NA`, because a missing abstract is better than the wrong one.
+Many works in OpenAlex have no abstract on file, so expect gaps.
+
+**Diagnosing gaps.** The `abstract_status` column says what happened to each
+reference:
+
+```{r status, eval = FALSE}
+table(res$abstract_status)
+
+# titles that did not match, with the closest candidate found
+res[res$abstract_status == "title not matched",
+    c("title", "closest_title", "closest_score")]
+
+# if the closest titles are the right papers, accept looser matches
+res <- fetch_abstracts(res, min_match = 0.75)
+
+# "year differs": the title matched but the years are far apart
+# (re-editions, online-first dates)
+res[res$abstract_status == "year differs", c("title", "year", "closest_year")]
+res <- fetch_abstracts(res, max_year_diff = 10)
+```
+
+The statuses are `found`, `no abstract on file`, `title not matched`,
+`year differs`, `no results`, and `lookup failed`. Only the still-missing
+references are retried when you run the function again on its own result. The
+columns `abstract_match` and `abstract_source` help you spot-check what was
+found.
+
+**Usage limits.** A free key currently allows a daily allowance of credits, and
+a title lookup costs more than a DOI lookup, so a few thousand references fit in
+a day. If the allowance runs out, the function stops and keeps what it found.
+Run it again later on the same object and it picks up where it left off.
+
+## Topic modeling
+
+The text analytics all work on a data frame with an `abstract` column, such as
+the output of `bib_to_df()`. If your column has a different name, pass it with
+`text = "..."`.
+
+```{r refs-abstracts}
+refs <- bib_to_df(system.file("extdata", "sample_abstracts.bib",
+                              package = "citelens"))
+nrow(refs)
+```
+
+`topic_model()` fits a latent Dirichlet allocation model to the abstracts. Set a
+`seed` so the result is reproducible.
+
+```{r topic-model}
+m <- topic_model(refs, k = 3, seed = 1)
+m
+```
+
+Printing the model gives each topic's prevalence, a coherence score, and its top
+words. The helpers return the same information as data frames:
+
+```{r topic-helpers}
+topic_terms(m, n = 5)      # top words per topic
+topic_summary(m)           # one row per topic
+```
+
+`topic_documents()` adds each abstract's dominant topic to your table, along
+with the probability of that topic and the full topic mixture:
+
+```{r topic-documents}
+refs2 <- topic_documents(m, refs)
+head(refs2[, c("title", "dominant_topic", "dominant_prob")])
+```
+
+Two charts summarize a model:
+
+```{r topic-plots}
+plot_topic_terms(m)
+plot_topic_prevalence(m)
+```
+
+### Choosing the number of topics
+
+There is no single correct `k`. `topic_k_search()` fits models for a range of
+values so you can compare them, and `plot()` draws the comparison.
+
+```{r k-search}
+ks <- topic_k_search(refs, k = 2:5, seed = 1)
+plot(ks)
+```
+
+Treat this as a guide and read the topics themselves. A `k` whose topics you can
+name and defend is usually better than one that wins on a statistic.
+
+### Tips
+
+* Topic models work best with dozens of abstracts or more. The functions warn
+  when you supply very few.
+* Words that carry no meaning in your field can be dropped with
+  `stopwords = c("student", "college")`. The built-in list is available from
+  `citelens_stopwords()`.
+* `max_doc_prop = 0.5` drops words found in more than half the abstracts.
+* Before modeling, words are lower-cased, punctuation and numbers are removed,
+  common English words and abstract boilerplate ("study", "results", and so on)
+  are dropped, and simple plurals are merged ("student" and "students" count as
+  one).
+
+## Document similarity
+
+`doc_similarity()` compares every pair of abstracts using cosine similarity of
+TF-IDF word weights.
+
+```{r similarity}
+s <- doc_similarity(refs)
+s
+```
+
+Find the closest matches to one paper, or look for likely duplicate entries:
+
+```{r similar-to}
+similar_to(s, "syn01", n = 3, data = refs)
+find_duplicates(s, cutoff = 0.8, data = refs)
+```
+
+`plot_similarity()` draws a heatmap with similar abstracts grouped together:
+
+```{r similarity-plot, fig.width = 7, fig.height = 6}
+plot_similarity(s)
+```
+
+To work with the numbers, `similarity_to_df()` returns them as a data frame, in
+either a matrix layout (one row and column per reference) or a pairs layout (one
+row per pair, most similar first):
+
+```{r similarity-df}
+head(similarity_to_df(s, "pairs", data = refs), 5)
+```
+
+Add `xlsx = "similarity.xlsx"` to also save an Excel workbook with both
+layouts, and `cutoff = 0.5` to keep only pairs at or above that similarity.
+
+Similarity reflects shared vocabulary, not shared meaning. Two abstracts on
+different subjects can look alike if they use the same technical language, so
+use `stopwords =` to remove words common to your whole collection.
+
+## Trends over time
+
+The trend functions need a `year` column. `word_trends()` shows the share of
+abstracts mentioning each word, by year or by group of years:
+
+```{r word-trends}
+w <- word_trends(refs, words = c("retention", "persistence", "dropout"),
+                 bin = 3)
+w
+plot_word_trends(w)
+```
+
+`bin` groups years; `bin = 3` uses three-year periods. If you leave `words` as
+`NULL`, the most common words are used.
+
+`topic_trends()` does the same for topics, using a fitted model:
+
+```{r topic-trends}
+tt <- topic_trends(m, refs, bin = 3)
+plot_topic_trends(tt)
+```
+
+Check `n_period`, the number of abstracts in each period. Periods with only a
+few abstracts give jumpy shares, so avoid reading much into them.
+
+## Using the results with other tools
+
+Because `citelens` produces ordinary BibTeX files, data frames, and Excel
+workbooks, you can hand its output to other tools.
+
+* The `.bib` file opens in any reference manager that reads BibTeX.
+* The data frames work with the usual R tools (`dplyr`, `ggplot2`, and others).
+* The Excel files can be opened in Excel or imported by other software.
+
+Packages that expect records in a specific database layout, such as the field
+names used by Scopus or Web of Science, may need extra renaming of columns
+before they accept the data. Check the documentation of the tool you plan to
+use.
+
+## Good to know
+
+* The text analytics skip references with no abstract and tell you how many were
+  skipped.
+* All data frame columns are character, including `year`.
+* Accent commands such as `{\'e}` are left as LaTeX when reading BibTeX.
+* BibTeX features supported when reading include `@string` macros, month names,
+  `#` concatenation, and `{...}`, `"..."`, and `(...)` delimiters. `@comment`
+  and `@preamble` blocks are ignored.
+* Topic modeling and similarity describe the *text* of abstracts. They are
+  exploratory tools, not substitutes for reading the papers.
+
+```{r session-info}
+sessionInfo()
+```
