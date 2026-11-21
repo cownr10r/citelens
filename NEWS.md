@@ -1,3 +1,10 @@
+# citelens (development version)
+
+* Added a getting-started vignette covering conversion of RefWorks, RIS and
+  Google Scholar exports, abstract lookup in OpenAlex, topic modeling,
+  document similarity, and trends over time.
+
+
 # citelens 0.1.0
 
 * Initial release.
