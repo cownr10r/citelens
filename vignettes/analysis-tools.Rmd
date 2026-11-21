@@ -1,0 +1,367 @@
+---
+title: "Duplicates, rankings, networks and abstract analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Duplicates, rankings, networks and abstract analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+has_igraph <- requireNamespace("igraph", quietly = TRUE)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6.5,
+  fig.height = 4,
+  dpi = 100
+)
+library(citelens)
+```
+
+## Introduction
+
+The [Getting started](citelens.html) vignette covers getting records into R:
+converting RefWorks and RIS exports, reading BibTeX, parsing Google Scholar
+results, and filling in missing abstracts. This vignette covers what you can do
+once you have a data frame of papers. Four tools are described here:
+
+| Question | Function |
+|---|---|
+| Is the same paper listed twice? | `find_duplicate_papers()`, `dedupe_papers()` |
+| Which papers, venues and authors are cited most? | `citation_rank()` |
+| Who writes together, and in which groups? | `author_network()` and its plots |
+| How does the vocabulary of abstracts change over time? | `abstract_ca()` |
+
+None of them needs a Scopus or Web of Science subscription. They work on the
+data frames that the rest of citelens produces, or on any data frame with the
+right columns.
+
+The network plots use the igraph package, which is not required by the rest of
+citelens. Install it with `install.packages("igraph")` if you want them.
+
+## Sample data
+
+The examples use two small data sets that ship with the package. Both are
+synthetic: the names, titles and abstracts are invented.
+
+```{r sample-data}
+f <- system.file("extdata", "sample_authors.csv", package = "citelens")
+papers <- read.csv(f, stringsAsFactors = FALSE)
+dim(papers)
+head(papers, 4)
+```
+
+`sample_authors.csv` has 18 rows with the columns the functions expect by
+default: `title`, `authors` (separated by " and "), `year` and `cited_by`. If
+your data comes from `bib_to_df()` the author column is called `author`, and
+the functions below detect it automatically. If your columns have other names,
+every function has arguments (`title`, `authors`, `year`, `cites`) to say which
+column is which.
+
+## Finding duplicate papers
+
+Google Scholar and reference managers often list one paper more than once: a
+journal version and a preprint, a re-indexed copy with a single citation, a
+reprint with a new year. Left alone, duplicates inflate citation counts and make
+two authors look as if they wrote more papers together than they did.
+`find_duplicate_papers()` flags likely duplicates without changing your data.
+
+```{r duplicates}
+dups <- find_duplicate_papers(papers)
+dups
+```
+
+Rows 1 and 7 are the same paper: the title differs only by a full stop, the
+year differs, and the second copy has one citation. The most-cited copy in each
+group is marked `KEEP`.
+
+Titles are compared after lower-casing and removing accents, punctuation and
+extra spaces. By default (`method = "near"`) titles that are within 8% of each
+other by edit distance also match, which catches a missing word or a typo. Use
+`method = "exact"` to require identical normalised titles, or change the
+tolerance with `max_dist`.
+
+### Same title, different paper
+
+Generic titles are common. Row 18 of the sample data has exactly the same title
+as row 1, but it is by different authors and is a different paper. It is not
+flagged, because by default a pair must also share at least one author surname
+(`require_author_overlap = TRUE`). Turning the check off shows what would
+happen otherwise:
+
+```{r overlap}
+find_duplicate_papers(papers, require_author_overlap = FALSE)
+```
+
+Keep the default unless your data has no author information.
+
+### Removing duplicates
+
+Review the list first, then let `dedupe_papers()` drop the less-cited copies:
+
+```{r dedupe}
+clean <- dedupe_papers(papers)
+nrow(clean)
+attr(clean, "dropped")
+```
+
+If you disagree with the automatic choice, name the rows to drop yourself with
+`drop_rows = c(7)`.
+
+You rarely need to call these functions directly. `author_network()` and
+`citation_rank()` both remove duplicate listings by default and tell you which
+rows they dropped. Use `dedupe = FALSE` in either to count every row.
+
+## Ranking by citations
+
+`citation_rank()` ranks papers, venues or authors by citation count and
+computes citation indices for the whole collection.
+
+```{r rank}
+res <- citation_rank(papers, current_year = 2024)
+res
+```
+
+The message says that the duplicate listing was removed before counting. The
+top block shows the indices for the collection:
+
+* **h-index**: the largest *h* such that *h* papers each have at least *h*
+  citations.
+* **g-index**: the largest *g* such that the top *g* papers together have at
+  least *g*^2^ citations (capped at the number of papers).
+* **i10-index**: the number of papers with at least 10 citations.
+
+The table has one row per paper. Besides `citations` it has a `percentile`
+(the percent of papers with strictly fewer citations), the share of all
+citations, a running total (`cum_share`), the paper's age, and
+`cites_per_year`, which is useful for comparing an older paper with a recent
+one. The examples pass `current_year = 2024` so the output does not change as
+the calendar does; by default the current year is used.
+
+Ties share a rank, and the next rank is skipped (for example 1, 1, 3).
+
+### Authors and venues
+
+Use `by` to rank something other than papers. For authors, each author is
+credited with the full citation count of every paper they appear on:
+
+```{r rank-author}
+citation_rank(papers, by = "author", top_n = 6)$ranked
+```
+
+Each author gets their own `h_index`, computed from their papers. Ranking
+venues needs a `venue` column, as produced by `scholar_parse_html()` and
+`bib_to_df()`: `citation_rank(d, by = "venue")`.
+
+`top_n` shortens the table but never the indices, which are always computed on
+the full data. The result is a list, so `res$index` and `res$ranked` are plain
+data frames you can write to Excel or plot.
+
+## Co-authorship networks
+
+`author_network()` turns the author lists into a network. Authors are the
+nodes. Two authors are joined by a line if they share a paper, and the line's
+weight is the number of papers they share.
+
+```{r network, eval = has_igraph}
+net <- author_network(papers)
+net
+```
+
+The message shows that duplicates were removed first. Without that step, the
+duplicate copy of row 1 would make its authors look like they had written one
+more paper together than they did.
+
+The printed summary describes the whole network: the number of authors and
+connections, how many separate groups there are, the share of authors in the
+largest group, and the modularity of the communities that Louvain clustering
+found. The table underneath lists authors by *strength*, the sum of their edge
+weights.
+
+### What is inside
+
+```{r network-parts, eval = has_igraph}
+names(net)
+net$components
+```
+
+* `nodes` has one row per author: papers, total citations, degree (number of
+  distinct co-authors), strength, betweenness, closeness, eigenvector
+  centrality, and the component and community each author belongs to.
+* `edges` lists the author pairs and their weights.
+* `summary` has the network-level statistics.
+* `communities` summarises each Louvain community.
+* `components` has one row per connected group of authors: who is in it, how
+  many papers produced it, its total citations and its most-cited paper. The
+  `component` number is the ID used on the plots and in the functions below.
+* `duplicates` holds any rows that were dropped as duplicates.
+
+A collection of unrelated papers produces many small disconnected groups,
+because every paper's author list is a clique. Betweenness is non-zero only for
+authors who connect others *within* a group, and when most groups are separate,
+communities simply coincide with components. Read these statistics with that in
+mind.
+
+### Drawing the groups
+
+`plot()` draws one small map for each group of authors who published together:
+
+```{r network-plot, eval = has_igraph, fig.width = 7, fig.height = 6}
+plot(net)
+```
+
+Each dot is an author. An orange line, with a number on it, joins two authors
+who published together more than once, and the number is how many papers. A
+gray line joins two authors who shared one paper. Each panel is named after the
+strongest pair in the group. Groups from a single paper are left out by
+default, and when more groups qualify than fit on the page, the ones with the
+most papers are drawn. Control this with `min_papers`, `max_panels` and
+`components`.
+
+For a single combined picture, use `type = "overview"`. Dots are coloured by
+the total citations of the author's papers and sized by collaboration strength,
+and the `#` labels match the IDs in `net$components`:
+
+```{r network-overview, eval = has_igraph, fig.width = 7, fig.height = 4.5}
+plot(net, type = "overview", label_top = 8)
+```
+
+### One cluster at a time
+
+`plot_cluster()` draws a single group, which is useful for slides. Use the
+component ID from `net$components`:
+
+```{r network-cluster, eval = has_igraph, fig.width = 6.5, fig.height = 4}
+plot_cluster(net, net$components$component[1])
+```
+
+The layout is arranged by an algorithm and only the connections carry meaning,
+so rerunning with a different `seed` gives a different but equivalent
+arrangement. For a general audience try `core_only = TRUE`, which shows only
+authors on two or more papers, and `simple = TRUE`, which makes the dots and
+labels larger.
+
+### Filtering to repeat collaborators
+
+Many collections contain mostly one-off groups. `min_component_papers` drops
+every group supported by fewer than that many papers before any statistics are
+computed, so the metrics, communities and IDs all describe the filtered
+network:
+
+```{r network-filter, eval = has_igraph}
+net2 <- author_network(papers, min_component_papers = 2)
+net2$components[, c("component", "n_authors", "n_papers", "top_paper")]
+```
+
+### Saving maps
+
+`cluster_maps()` writes a map for every group, either as one PNG per group, one
+multi-page PDF, or both. It never writes anything unless you give it a
+location:
+
+```{r cluster-maps, eval = FALSE}
+cluster_maps(net2, dir = "cluster_maps", pdf = "cluster_maps.pdf")
+```
+
+If your system has no working PNG device (a headless server without X11, for
+example) the PNG files are skipped with a warning, and the PDF is still
+written.
+
+### Caveats about the data
+
+Google Scholar shortens long author lists with "...". The authors at the end of
+a long list are missing from `scholar_parse_html()` results, so collaborations
+that involve them are not seen. Also, a citation count belongs to the paper and
+not to any one author, so `total_citations` gives each author full credit for
+every paper they appear on.
+
+## Correspondence analysis of abstracts
+
+`abstract_ca()` asks how the vocabulary of a set of abstracts differs between
+groups of papers, using correspondence analysis. Here the groups are time
+periods. It builds a table of word counts by period, then finds the few
+dimensions that best separate the periods and the words that drive the
+separation.
+
+The sample abstracts are synthetic, so they contain some filler words that would
+dominate the result. In real data you would use your own stop-word list, if
+any:
+
+```{r ca}
+f <- system.file("extdata", "sample_abstracts.bib", package = "citelens")
+refs <- bib_to_df(f)
+filler <- c("note", "time", "follow", "shape", "touch", "studied",
+            "evidence", "work", "attention", "discussion")
+
+ca <- abstract_ca(refs, breaks = c(2017, 2020), stopwords = filler,
+                  min_doc_freq = 3)
+ca
+```
+
+The periods come from `breaks`, which here means before 2017, 2017 to 2019 and
+2020 onward. Leave `breaks` out and the function creates `n_periods`
+equal-sized periods instead. The inertia table shows how much of the
+differences each dimension captures. The final block lists, for each period, the
+words used much more than average, ranked by *lift* (how many times more
+frequent a word is in that period than in the whole collection).
+
+```{r ca-distinctive}
+head(ca$distinctive, 6)
+```
+
+The plot puts periods and words on the same two dimensions. Periods that sit
+close together used similar vocabulary, and a word near a period is
+characteristic of it:
+
+```{r ca-plot, fig.width = 6.5, fig.height = 5}
+plot(ca)
+```
+
+Some practical points:
+
+* Only abstracts with at least `min_words` words (default 30) and a valid year
+  are used, and only words in at least `min_doc_freq` abstracts (default 5)
+  enter the analysis. Lower these for small collections, and raise them for
+  large ones to keep the plot readable.
+* `min_count` sets how many times a word must be used within a period before it
+  can be listed as distinctive for that period.
+* The function needs a reasonable number of abstracts; it stops with a message
+  if there are fewer than 20 usable ones.
+* Correspondence analysis describes association, not cause. A word that is
+  distinctive of a period tells you what authors wrote about then, not why.
+
+## Putting it together
+
+A typical session with a Google Scholar export looks like this:
+
+```{r workflow, eval = FALSE}
+d <- scholar_parse_html("scholar_results.html")
+
+find_duplicate_papers(d)            # review before anything is dropped
+rank <- citation_rank(d)            # indices and top papers
+rank_au <- citation_rank(d, by = "author", top_n = 20)
+
+net <- author_network(d, min_component_papers = 2)
+plot(net)
+cluster_maps(net, pdf = "cluster_maps.pdf")
+
+ca <- abstract_ca(d, text = "abstract")   # when you have abstracts
+plot(ca)
+```
+
+Results are plain lists of data frames, so you can write any table to Excel with
+`writexl::write_xlsx()` or continue the analysis in your own code. If your
+records are missing abstracts, the OpenAlex lookup described in the
+[Getting started](citelens.html) vignette can fill many of them in.
+
+## Good to know
+
+* Everything runs locally. Nothing is sent anywhere, except the explicit
+  OpenAlex lookup in the other vignette.
+* Citation counts are only as good as their source. A Scholar count is not a
+  Scopus or Web of Science count, so compare indices only within one source.
+* Duplicate detection is a heuristic. Review `find_duplicate_papers()` when the
+  decision matters, and use `dedupe = FALSE` or `drop_rows` to override it.
+* Please report problems or ideas at
+  <https://github.com/cownr10r/citelens/issues>.

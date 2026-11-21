@@ -375,8 +375,8 @@ plot_network_overview <- function(x, min_component = 3, giant_only = FALSE,
   rl <- igraph::norm_coords(lay, -1, 1, -1, 1)   # same rescaling plot.igraph applies
   for (i in seq_along(subs)) {
     sel <- which(igraph::V(gg)$name %in% igraph::V(subs[[i]])$name)
-    graphics::text(min(rl[sel, 1]) - 0.03, max(rl[sel, 2]) + 0.15, paste0("#", ids[i]),
-                   cex = 0.6, col = "grey35", adj = c(0, 0.5), font = 2)
+    graphics::text(min(rl[sel, 1]) - 0.05, mean(range(rl[sel, 2])), paste0("#", ids[i]),
+                   cex = 0.65, col = "grey35", adj = c(1, 0.5), font = 2)
   }
   graphics::mtext(paste("Size = collaboration strength | colour = total citations of the",
                         "author's papers (log) | thick edge = repeat collaboration"),
@@ -641,8 +641,12 @@ plot_clusters <- function(x, components = NULL, ncol = NULL, max_panels = 6, min
       who <- sn(nd$author[order(-nd$n_papers, -nd$strength)][1])
       others <- na - 1
     }
-    ttl <- sprintf("%s (+%d co-author%s): %d papers", who, others,
-                   if (others == 1) "" else "s", np)
+    ttl <- if (others > 0) {
+      sprintf("%s (+%d co-author%s): %d papers", who, others,
+              if (others == 1) "" else "s", np)
+    } else {
+      sprintf("%s: %d papers", who, np)
+    }
     plot_cluster(x, cid, seed = seed, main = ttl, core_only = core_only,
                  uniform = TRUE, key = FALSE, label_cex = 0.95)
   }
@@ -652,10 +656,10 @@ plot_clusters <- function(x, components = NULL, ncol = NULL, max_panels = 6, min
   graphics::plot.new()
   graphics::plot.window(xlim = c(0, 1), ylim = c(0, 1))
   graphics::segments(0.02, 0.018, 0.06, 0.018, col = "#eb6834", lwd = 5, lend = "round")
-  graphics::text(0.07, 0.018, "orange line = published together more than once (number = papers)",
-                 adj = c(0, 0.5), cex = 0.95)
-  graphics::segments(0.62, 0.018, 0.66, 0.018, col = "#b9b8b1", lwd = 2, lend = "round")
-  graphics::text(0.67, 0.018, "gray line = published together once", adj = c(0, 0.5), cex = 0.95)
+  graphics::text(0.07, 0.018, "orange = 2+ papers together (number = papers)",
+                 adj = c(0, 0.5), cex = 0.85)
+  graphics::segments(0.64, 0.018, 0.68, 0.018, col = "#b9b8b1", lwd = 2, lend = "round")
+  graphics::text(0.69, 0.018, "gray = 1 paper together", adj = c(0, 0.5), cex = 0.85)
   invisible(components)
 }
 
