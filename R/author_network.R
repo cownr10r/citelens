@@ -701,24 +701,57 @@ cluster_maps <- function(x, dir = NULL, pdf = NULL, min_authors = 2,
   ids <- cm$component
   if (!length(ids)) stop("No clusters to draw.", call. = FALSE)
   if (!is.null(dir)) {
-    dir.create(dir, showWarnings = FALSE, recursive = TRUE)
-    # Cairo does not need X11, which is missing on some macOS and Linux setups
-    ptype <- if (isTRUE(capabilities("cairo"))) "cairo" else getOption("bitmapType")
-    for (k in ids) {
-      grDevices::png(file.path(dir, sprintf("cluster_%03d.png", k)), width = width,
-                     height = height, units = "in", res = res, type = ptype)
-      tryCatch(plot_cluster(x, k), finally = grDevices::dev.off())
+    ptype <- .png_type()
+    if (!is.na(ptype)) {
+      dir.create(dir, showWarnings = FALSE, recursive = TRUE)
+      for (k in ids) {
+        f_png <- file.path(dir, sprintf("cluster_%03d.png", k))
+        if (ptype == "default") {
+          grDevices::png(f_png, width = width, height = height, units = "in", res = res)
+        } else {
+          grDevices::png(f_png, width = width, height = height, units = "in", res = res,
+                         type = ptype)
+        }
+        tryCatch(plot_cluster(x, k), finally = grDevices::dev.off())
+      }
+      message("Wrote ", length(ids), " PNG files to ", normalizePath(dir))
+    } else {
+      warning("No working PNG graphics device on this system (on macOS this usually ",
+              "means XQuartz is missing). PNG files were not written; use `pdf =` ",
+              "instead, or install XQuartz.", call. = FALSE)
     }
-    message("Wrote ", length(ids), " PNG files to ", normalizePath(dir))
   }
   if (!is.null(pdf)) {
-    if (isTRUE(capabilities("cairo"))) {   # handles accented names
-      grDevices::cairo_pdf(pdf, width = width, height = height)
-    } else {
-      grDevices::pdf(pdf, width = width, height = height)
-    }
+    grDevices::pdf(pdf, width = width, height = height)
     tryCatch(for (k in ids) plot_cluster(x, k), finally = grDevices::dev.off())
     message("Wrote ", pdf)
   }
   invisible(ids)
 }
+
+# Find a PNG device type that works here: the default first, then Cairo, then
+# Quartz (macOS). Returns the type name, "default", or NA if none works. Some
+# headless systems have no X11 and no Quartz, so png() cannot create a file.
+.png_type <- function() {
+  f <- tempfile(fileext = ".png")
+  on.exit(unlink(f), add = TRUE)
+  for (ty in c("default", "cairo", "quartz")) {
+    unlink(f)
+    ok <- tryCatch({
+      suppressWarnings(
+        if (ty == "default") grDevices::png(f, width = 200, height = 200)
+        else grDevices::png(f, width = 200, height = 200, type = ty)
+      )
+      tryCatch({
+        op <- graphics::par(mar = c(0, 0, 0, 0))
+        graphics::plot.new()   # a file is only written once a page is drawn
+        graphics::par(op)
+      }, finally = grDevices::dev.off())
+      file.exists(f)
+    }, error = function(e) FALSE)
+    if (isTRUE(ok)) return(ty)
+  }
+  NA_character_
+}
+
+.png_ok <- function() !is.na(.png_type())

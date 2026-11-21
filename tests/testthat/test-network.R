@@ -83,17 +83,23 @@ test_that("plots draw and leave graphics settings unchanged", {
   expect_equal(graphics::par("mfrow"), c(1, 1))
 })
 
-test_that("cluster_maps writes files only when asked", {
-  skip_on_cran()
-  skip_if_not(isTRUE(capabilities("cairo")), "Cairo graphics not available")
+test_that("cluster_maps writes a PDF only when asked", {
   net <- suppressMessages(author_network(sample_papers(), min_component_papers = 2))
   expect_error(cluster_maps(net), "dir")
-  d <- file.path(tempdir(), "maps_test")
   f <- file.path(tempdir(), "maps_test.pdf")
-  expect_message(ids <- cluster_maps(net, dir = d, pdf = f, res = 50), "Wrote")
-  expect_equal(length(list.files(d, pattern = "png$")), length(ids))
+  expect_message(ids <- cluster_maps(net, pdf = f), "Wrote")
   expect_true(file.exists(f))
-  unlink(c(d, f), recursive = TRUE)
+  expect_gt(length(ids), 0)
+  unlink(f)
+})
+
+test_that("cluster_maps writes one PNG per cluster", {
+  skip_if_not(citelens:::.png_ok(), "No working PNG device on this system")
+  net <- suppressMessages(author_network(sample_papers(), min_component_papers = 2))
+  d <- file.path(tempdir(), "maps_test")
+  expect_message(ids <- cluster_maps(net, dir = d, res = 50), "Wrote")
+  expect_equal(length(list.files(d, pattern = "png$")), length(ids))
+  unlink(d, recursive = TRUE)
 })
 
 test_that("print gives a short summary", {
