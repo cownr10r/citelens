@@ -1,8 +1,41 @@
 # citelens (development version)
 
-* Added a getting-started vignette covering conversion of RefWorks, RIS and
-  Google Scholar exports, abstract lookup in OpenAlex, topic modeling,
-  document similarity, and trends over time.
+# citelens (development version)
+
+## New functions
+
+* `abstract_ca()` runs correspondence analysis on the terms in abstracts,
+  comparing groups such as periods, venues or sources. It comes with `plot()`
+  and `print()` methods.
+
+* `author_network()` builds a weighted co-authorship network and reports
+  author-level and network-level statistics, connected components and
+  communities. `plot()` draws one small map per group of authors, or a single
+  overview. `plot_cluster()`, `plot_clusters()` and `plot_network_overview()`
+  draw individual views, and `cluster_maps()` saves maps for every cluster to
+  PNG and PDF files. Nothing is written unless you supply `dir` or `pdf`.
+
+* `find_duplicate_papers()` and `dedupe_papers()` flag and remove papers that
+  are listed more than once, such as a journal version and a preprint. Matching
+  uses normalised titles with optional edit-distance tolerance, and by default
+  a pair must also share an author surname.
+
+* `citation_rank()` ranks papers, venues or authors by citations and reports
+  the h-index, g-index and i10-index for the collection.
+
+## Other changes
+
+* `author_network()` and `citation_rank()` drop duplicate listings of the same
+  paper by default (`dedupe = TRUE`) and report which rows were removed in
+  `$duplicates`. Use `dedupe = FALSE` to keep every row.
+
+* New vignette, "Getting started with citelens".
+
+* New sample data, `inst/extdata/sample_authors.csv`: a small synthetic set of
+  papers used in examples and tests.
+
+* igraph is now in Suggests. The network functions need it, and they give a
+  clear error if it isn't installed.
 
 
 # citelens 0.1.0
