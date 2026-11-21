@@ -64,6 +64,6 @@ if (requireNamespace("igraph", quietly = TRUE)) {
   out <- tempfile("maps")
   cluster_maps(net, dir = out, pdf = file.path(tempdir(), "maps.pdf"))
 }
-#> Wrote 3 PNG files to /tmp/RtmpcpxxFK/maps195a7ef67bc5
-#> Wrote /tmp/RtmpcpxxFK/maps.pdf
+#> Wrote 3 PNG files to /tmp/RtmpvqUOhq/maps1bc272d784e1
+#> Wrote /tmp/RtmpvqUOhq/maps.pdf
 ```

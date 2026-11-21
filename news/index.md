@@ -2,9 +2,58 @@
 
 ## citelens (development version)
 
-- Added a getting-started vignette covering conversion of RefWorks, RIS
-  and Google Scholar exports, abstract lookup in OpenAlex, topic
-  modeling, document similarity, and trends over time.
+## citelens (development version)
+
+### New functions
+
+- [`abstract_ca()`](https://cownr10r.github.io/citelens/reference/abstract_ca.md)
+  runs correspondence analysis on the terms in abstracts, comparing
+  groups such as periods, venues or sources. It comes with
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) and
+  [`print()`](https://rdrr.io/r/base/print.html) methods.
+
+- [`author_network()`](https://cownr10r.github.io/citelens/reference/author_network.md)
+  builds a weighted co-authorship network and reports author-level and
+  network-level statistics, connected components and communities.
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) draws one
+  small map per group of authors, or a single overview.
+  [`plot_cluster()`](https://cownr10r.github.io/citelens/reference/plot_cluster.md),
+  [`plot_clusters()`](https://cownr10r.github.io/citelens/reference/plot_clusters.md)
+  and
+  [`plot_network_overview()`](https://cownr10r.github.io/citelens/reference/plot_network_overview.md)
+  draw individual views, and
+  [`cluster_maps()`](https://cownr10r.github.io/citelens/reference/cluster_maps.md)
+  saves maps for every cluster to PNG and PDF files. Nothing is written
+  unless you supply `dir` or `pdf`.
+
+- [`find_duplicate_papers()`](https://cownr10r.github.io/citelens/reference/find_duplicate_papers.md)
+  and
+  [`dedupe_papers()`](https://cownr10r.github.io/citelens/reference/dedupe_papers.md)
+  flag and remove papers that are listed more than once, such as a
+  journal version and a preprint. Matching uses normalised titles with
+  optional edit-distance tolerance, and by default a pair must also
+  share an author surname.
+
+- [`citation_rank()`](https://cownr10r.github.io/citelens/reference/citation_rank.md)
+  ranks papers, venues or authors by citations and reports the h-index,
+  g-index and i10-index for the collection.
+
+### Other changes
+
+- [`author_network()`](https://cownr10r.github.io/citelens/reference/author_network.md)
+  and
+  [`citation_rank()`](https://cownr10r.github.io/citelens/reference/citation_rank.md)
+  drop duplicate listings of the same paper by default (`dedupe = TRUE`)
+  and report which rows were removed in `$duplicates`. Use
+  `dedupe = FALSE` to keep every row.
+
+- New vignette, “Getting started with citelens”.
+
+- New sample data, `inst/extdata/sample_authors.csv`: a small synthetic
+  set of papers used in examples and tests.
+
+- igraph is now in Suggests. The network functions need it, and they
+  give a clear error if it isn’t installed.
 
 ## citelens 0.1.0
 
