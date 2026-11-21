@@ -55,8 +55,8 @@ can be run as is.
 ``` r
 
 list.files(system.file("extdata", package = "citelens"))
-#> [1] "sample_abstracts.bib" "sample_refworks.ris"  "sample_refworks.txt" 
-#> [4] "sample.bib"
+#> [1] "sample_abstracts.bib" "sample_authors.csv"   "sample_refworks.ris" 
+#> [4] "sample_refworks.txt"  "sample.bib"
 ```
 
 - `sample_refworks.ris` and `sample_refworks.txt`: a few references in
@@ -109,7 +109,7 @@ an output path:
 
 bib_file <- tempfile(fileext = ".bib")
 convert_refworks(ris, bib_file)
-#> Converted 4 record(s) -> /tmp/RtmpRsF5Wr/file1a1fa36d56a.bib
+#> Converted 4 record(s) -> /tmp/RtmpLY0Sdq/file1ba03dc73959.bib
 file.exists(bib_file)
 #> [1] TRUE
 ```
@@ -124,8 +124,8 @@ does the whole job in one step. It can also keep the BibTeX copy.
 
 xlsx_file <- tempfile(fileext = ".xlsx")
 refs <- refworks_to_xlsx(ris, xlsx_file, bib = tempfile(fileext = ".bib"))
-#> Converted 4 record(s) -> /tmp/RtmpRsF5Wr/file1a1f3a0c868d.bib
-#> Wrote 4 entries to /tmp/RtmpRsF5Wr/file1a1f5950c8ec.xlsx
+#> Converted 4 record(s) -> /tmp/RtmpLY0Sdq/file1ba03df98a72.bib
+#> Wrote 4 entries to /tmp/RtmpLY0Sdq/file1ba044d8602c.xlsx
 file.exists(xlsx_file)
 #> [1] TRUE
 ```

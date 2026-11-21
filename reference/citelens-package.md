@@ -13,6 +13,8 @@ Useful links:
 
 - <https://github.com/cownr10r/citelens>
 
+- <https://cownr10r.github.io/citelens/>
+
 - Report bugs at <https://github.com/cownr10r/citelens/issues>
 
 ## Author

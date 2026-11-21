@@ -115,8 +115,8 @@ Linux.</p>
 can be run as is.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"citelens"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "sample_abstracts.bib" "sample_refworks.ris"  "sample_refworks.txt" </span></span>
-<span><span class="co">#&gt; [4] "sample.bib"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "sample_abstracts.bib" "sample_authors.csv"   "sample_refworks.ris" </span></span>
+<span><span class="co">#&gt; [4] "sample_refworks.txt"  "sample.bib"</span></span></code></pre></div>
 <ul>
 <li>
 <code>sample_refworks.ris</code> and
@@ -168,7 +168,7 @@ anything unrecognized becomes <code>misc</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bib_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".bib"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/convert_refworks.html">convert_refworks</a></span><span class="op">(</span><span class="va">ris</span>, <span class="va">bib_file</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converted 4 record(s) -&gt; /tmp/RtmpRsF5Wr/file1a1fa36d56a.bib</span></span>
+<span><span class="co">#&gt; Converted 4 record(s) -&gt; /tmp/RtmpLY0Sdq/file1ba03dc73959.bib</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">bib_file</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <div class="section level3">
@@ -179,8 +179,8 @@ does the whole job in one step. It can also keep the BibTeX copy.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">xlsx_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".xlsx"</span><span class="op">)</span></span>
 <span><span class="va">refs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/refworks_to_xlsx.html">refworks_to_xlsx</a></span><span class="op">(</span><span class="va">ris</span>, <span class="va">xlsx_file</span>, bib <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".bib"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converted 4 record(s) -&gt; /tmp/RtmpRsF5Wr/file1a1f3a0c868d.bib</span></span>
-<span><span class="co">#&gt; Wrote 4 entries to /tmp/RtmpRsF5Wr/file1a1f5950c8ec.xlsx</span></span>
+<span><span class="co">#&gt; Converted 4 record(s) -&gt; /tmp/RtmpLY0Sdq/file1ba03df98a72.bib</span></span>
+<span><span class="co">#&gt; Wrote 4 entries to /tmp/RtmpLY0Sdq/file1ba044d8602c.xlsx</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">xlsx_file</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>The data frame is returned invisibly, so you can keep working with it
