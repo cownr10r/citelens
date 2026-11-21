@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">citelens</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,19 +34,16 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="citelens-development-version">citelens (development version)<a class="anchor" aria-label="anchor" href="#citelens-development-version"></a></h2>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="citelens-development-version-1">citelens (development version)<a class="anchor" aria-label="anchor" href="#citelens-development-version-1"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.2.0" id="citelens-020">citelens 0.2.0<a class="anchor" aria-label="anchor" href="#citelens-020"></a></h2>
 <div class="section level3">
-<h3 id="new-functions-development-version">New functions<a class="anchor" aria-label="anchor" href="#new-functions-development-version"></a></h3>
+<h3 id="new-functions-0-2-0">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-2-0"></a></h3>
 <ul><li><p><code><a href="../reference/abstract_ca.html">abstract_ca()</a></code> runs correspondence analysis on the terms in abstracts, comparing groups such as periods, venues or sources. It comes with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> and <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> methods.</p></li>
 <li><p><code><a href="../reference/author_network.html">author_network()</a></code> builds a weighted co-authorship network and reports author-level and network-level statistics, connected components and communities. <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> draws one small map per group of authors, or a single overview. <code><a href="../reference/plot_cluster.html">plot_cluster()</a></code>, <code><a href="../reference/plot_clusters.html">plot_clusters()</a></code> and <code><a href="../reference/plot_network_overview.html">plot_network_overview()</a></code> draw individual views, and <code><a href="../reference/cluster_maps.html">cluster_maps()</a></code> saves maps for every cluster to PNG and PDF files. Nothing is written unless you supply <code>dir</code> or <code>pdf</code>.</p></li>
 <li><p><code><a href="../reference/find_duplicate_papers.html">find_duplicate_papers()</a></code> and <code><a href="../reference/dedupe_papers.html">dedupe_papers()</a></code> flag and remove papers that are listed more than once, such as a journal version and a preprint. Matching uses normalised titles with optional edit-distance tolerance, and by default a pair must also share an author surname.</p></li>
 <li><p><code><a href="../reference/citation_rank.html">citation_rank()</a></code> ranks papers, venues or authors by citations and reports the h-index, g-index and i10-index for the collection.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="other-changes-development-version">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-development-version"></a></h3>
+<h3 id="other-changes-0-2-0">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-0-2-0"></a></h3>
 <ul><li><p><code><a href="../reference/author_network.html">author_network()</a></code> and <code><a href="../reference/citation_rank.html">citation_rank()</a></code> drop duplicate listings of the same paper by default (<code>dedupe = TRUE</code>) and report which rows were removed in <code>$duplicates</code>. Use <code>dedupe = FALSE</code> to keep every row.</p></li>
 <li><p>New vignette, “Getting started with citelens”.</p></li>
 <li><p>New sample data, <code>inst/extdata/sample_authors.csv</code>: a small synthetic set of papers used in examples and tests.</p></li>

@@ -1,8 +1,6 @@
 # Changelog
 
-## citelens (development version)
-
-## citelens (development version)
+## citelens 0.2.0
 
 ### New functions
 

@@ -109,7 +109,7 @@ an output path:
 
 bib_file <- tempfile(fileext = ".bib")
 convert_refworks(ris, bib_file)
-#> Converted 4 record(s) -> /tmp/RtmpPaXGul/file1b63d58d95a.bib
+#> Converted 4 record(s) -> /tmp/Rtmp4X1wNM/file1b79250f816f.bib
 file.exists(bib_file)
 #> [1] TRUE
 ```
@@ -124,8 +124,8 @@ does the whole job in one step. It can also keep the BibTeX copy.
 
 xlsx_file <- tempfile(fileext = ".xlsx")
 refs <- refworks_to_xlsx(ris, xlsx_file, bib = tempfile(fileext = ".bib"))
-#> Converted 4 record(s) -> /tmp/RtmpPaXGul/file1b632ff8184e.bib
-#> Wrote 4 entries to /tmp/RtmpPaXGul/file1b634b37b4ae.xlsx
+#> Converted 4 record(s) -> /tmp/Rtmp4X1wNM/file1b794e7f50e.bib
+#> Wrote 4 entries to /tmp/Rtmp4X1wNM/file1b7945593d51.xlsx
 file.exists(xlsx_file)
 #> [1] TRUE
 ```
@@ -598,7 +598,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] citelens_0.1.0
+#> [1] citelens_0.2.0
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] vctrs_0.7.3        cli_3.6.6          knitr_1.52         rlang_1.3.0       

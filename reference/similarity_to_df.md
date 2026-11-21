@@ -87,5 +87,5 @@ head(similarity_to_df(s, "pairs", data = refs), 3)
 #> 3     Advising and first-year retention
 out <- tempfile(fileext = ".xlsx")
 similarity_to_df(s, data = refs, xlsx = out)
-#> Wrote the similarity matrix (30 x 30) and 435 pair(s) to /tmp/RtmpGmYWHR/file191e7e7254c9.xlsx
+#> Wrote the similarity matrix (30 x 30) and 435 pair(s) to /tmp/RtmpJIvsnT/file193458267a80.xlsx
 ```
