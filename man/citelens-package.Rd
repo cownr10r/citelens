@@ -12,6 +12,7 @@ Converts 'RefWorks' and 'RIS' exports, and saved 'Google Scholar' results pages,
 Useful links:
 \itemize{
   \item \url{https://github.com/cownr10r/citelens}
+  \item \url{https://cownr10r.github.io/citelens/}
   \item Report bugs at \url{https://github.com/cownr10r/citelens/issues}
 }
 

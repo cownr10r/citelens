@@ -13,9 +13,19 @@ URL: https://github.com/cownr10r/citelens, https://cownr10r.github.io/citelens/
 BugReports: https://github.com/cownr10r/citelens/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
-Imports: Rcpp, writexl, ggplot2, xml2, jsonlite, curl
+Imports: 
+    Rcpp,
+    writexl,
+    ggplot2,
+    graphics,
+    xml2,
+    jsonlite,
+    curl,
+    grDevices,
+    utils
 LinkingTo: Rcpp
 Suggests: 
+    igraph,
     knitr,
     readxl,
     rmarkdown,
