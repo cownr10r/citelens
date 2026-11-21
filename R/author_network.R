@@ -702,9 +702,11 @@ cluster_maps <- function(x, dir = NULL, pdf = NULL, min_authors = 2,
   if (!length(ids)) stop("No clusters to draw.", call. = FALSE)
   if (!is.null(dir)) {
     dir.create(dir, showWarnings = FALSE, recursive = TRUE)
+    # Cairo does not need X11, which is missing on some macOS and Linux setups
+    ptype <- if (isTRUE(capabilities("cairo"))) "cairo" else getOption("bitmapType")
     for (k in ids) {
       grDevices::png(file.path(dir, sprintf("cluster_%03d.png", k)), width = width,
-                     height = height, units = "in", res = res)
+                     height = height, units = "in", res = res, type = ptype)
       tryCatch(plot_cluster(x, k), finally = grDevices::dev.off())
     }
     message("Wrote ", length(ids), " PNG files to ", normalizePath(dir))

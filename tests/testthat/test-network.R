@@ -84,6 +84,8 @@ test_that("plots draw and leave graphics settings unchanged", {
 })
 
 test_that("cluster_maps writes files only when asked", {
+  skip_on_cran()
+  skip_if_not(isTRUE(capabilities("cairo")), "Cairo graphics not available")
   net <- suppressMessages(author_network(sample_papers(), min_component_papers = 2))
   expect_error(cluster_maps(net), "dir")
   d <- file.path(tempdir(), "maps_test")
