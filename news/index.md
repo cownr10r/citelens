@@ -38,13 +38,6 @@
 
 ### Other changes
 
-- [`author_network()`](https://cownr10r.github.io/citelens/reference/author_network.md)
-  and
-  [`citation_rank()`](https://cownr10r.github.io/citelens/reference/citation_rank.md)
-  drop duplicate listings of the same paper by default (`dedupe = TRUE`)
-  and report which rows were removed in `$duplicates`. Use
-  `dedupe = FALSE` to keep every row.
-
 - New vignette, “Getting started with citelens”.
 
 - New sample data, `inst/extdata/sample_authors.csv`: a small synthetic
