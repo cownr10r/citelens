@@ -75,5 +75,5 @@ bib_to_df(f)
 # Also save an Excel copy
 out <- tempfile(fileext = ".xlsx")
 bib_to_df(f, xlsx = out)
-#> Wrote 3 entries to /tmp/RtmpVZl12j/file1a06717825df.xlsx
+#> Wrote 3 entries to /tmp/RtmpW2p9W8/file18fd7a5c066c.xlsx
 ```

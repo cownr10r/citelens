@@ -109,7 +109,7 @@ an output path:
 
 bib_file <- tempfile(fileext = ".bib")
 convert_refworks(ris, bib_file)
-#> Converted 4 record(s) -> /tmp/RtmpTz9x7D/file1c4c139edc4a.bib
+#> Converted 4 record(s) -> /tmp/RtmpQ2h6QC/file1b7e5afcaf02.bib
 file.exists(bib_file)
 #> [1] TRUE
 ```
@@ -124,8 +124,8 @@ does the whole job in one step. It can also keep the BibTeX copy.
 
 xlsx_file <- tempfile(fileext = ".xlsx")
 refs <- refworks_to_xlsx(ris, xlsx_file, bib = tempfile(fileext = ".bib"))
-#> Converted 4 record(s) -> /tmp/RtmpTz9x7D/file1c4c6e2c7eb8.bib
-#> Wrote 4 entries to /tmp/RtmpTz9x7D/file1c4c50783dd6.xlsx
+#> Converted 4 record(s) -> /tmp/RtmpQ2h6QC/file1b7e6ba79654.bib
+#> Wrote 4 entries to /tmp/RtmpQ2h6QC/file1b7e28c2942e.xlsx
 file.exists(xlsx_file)
 #> [1] TRUE
 ```

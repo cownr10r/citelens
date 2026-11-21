@@ -2,8 +2,9 @@ pandoc: 3.8.3
 pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
+  analysis-tools: analysis-tools.html
   citelens: citelens.html
-last_built: 2026-11-21T08:57Z
+last_built: 2026-11-21T19:14Z
 urls:
   reference: https://cownr10r.github.io/citelens/reference
   article: https://cownr10r.github.io/citelens/articles
