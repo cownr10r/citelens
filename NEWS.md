@@ -23,10 +23,6 @@
 
 ## Other changes
 
-* `author_network()` and `citation_rank()` drop duplicate listings of the same
-  paper by default (`dedupe = TRUE`) and report which rows were removed in
-  `$duplicates`. Use `dedupe = FALSE` to keep every row.
-
 * New vignette, "Getting started with citelens".
 
 * New sample data, `inst/extdata/sample_authors.csv`: a small synthetic set of
