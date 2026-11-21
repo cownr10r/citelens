@@ -1,7 +1,7 @@
 Package: citelens
 Type: Package
 Title: Tools for Citation Libraries and Text Analytics on Abstracts
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: person("Mario", "Martinez", email = "mario.a.martinez@live.com", role = c("aut", "cre", "cph"))
 Description: Converts 'RefWorks' and 'RIS' exports, and saved 'Google Scholar'
     results pages, to 'BibTeX', and reads 'BibTeX' files into data frames and
