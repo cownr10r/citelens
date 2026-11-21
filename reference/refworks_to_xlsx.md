@@ -43,5 +43,5 @@ The data frame of references, invisibly.
 ``` r
 ris <- system.file("extdata", "sample_refworks.ris", package = "citelens")
 refworks_to_xlsx(ris, tempfile(fileext = ".xlsx"))
-#> Wrote 4 entries to /tmp/RtmpCQmaQW/file186b27e29a08.xlsx
+#> Wrote 4 entries to /tmp/Rtmp7sCmfP/file185f23415250.xlsx
 ```
