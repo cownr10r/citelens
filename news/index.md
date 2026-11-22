@@ -4,6 +4,12 @@
 
 ### New functions
 
+- [`scholar_parse_html()`](https://cownr10r.github.io/citelens/reference/scholar_parse_html.md)
+  gains `flatten = TRUE`, which returns `author_list` as text so results
+  can be saved safely with
+  [`write.csv()`](https://rdrr.io/r/utils/write.table.html) or
+  [`writexl::write_xlsx()`](https://docs.ropensci.org/writexl/reference/write_xlsx.html).
+
 - [`abstract_ca()`](https://cownr10r.github.io/citelens/reference/abstract_ca.md)
   runs correspondence analysis on the terms in abstracts, comparing
   groups such as periods, venues or sources. It comes with

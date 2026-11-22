@@ -174,7 +174,7 @@ anything unrecognized becomes <code>misc</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bib_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".bib"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/convert_refworks.html">convert_refworks</a></span><span class="op">(</span><span class="va">ris</span>, <span class="va">bib_file</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converted 4 record(s) -&gt; /tmp/RtmplvTYg6/file1c545dbbf75.bib</span></span>
+<span><span class="co">#&gt; Converted 4 record(s) -&gt; /tmp/RtmpwgTB7x/file1c5157b44a5e.bib</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">bib_file</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <div class="section level3">
@@ -185,8 +185,8 @@ does the whole job in one step. It can also keep the BibTeX copy.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">xlsx_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".xlsx"</span><span class="op">)</span></span>
 <span><span class="va">refs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/refworks_to_xlsx.html">refworks_to_xlsx</a></span><span class="op">(</span><span class="va">ris</span>, <span class="va">xlsx_file</span>, bib <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".bib"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converted 4 record(s) -&gt; /tmp/RtmplvTYg6/file1c541fd0c482.bib</span></span>
-<span><span class="co">#&gt; Wrote 4 entries to /tmp/RtmplvTYg6/file1c5417c067fd.xlsx</span></span>
+<span><span class="co">#&gt; Converted 4 record(s) -&gt; /tmp/RtmpwgTB7x/file1c515e75589f.bib</span></span>
+<span><span class="co">#&gt; Wrote 4 entries to /tmp/RtmpwgTB7x/file1c514451e16e.xlsx</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">xlsx_file</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>The data frame is returned invisibly, so you can keep working with it
