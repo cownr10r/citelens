@@ -4,7 +4,7 @@
 \alias{scholar_parse_html}
 \title{Parse a saved Google Scholar results page}
 \usage{
-scholar_parse_html(input, recursive = FALSE)
+scholar_parse_html(input, recursive = FALSE, flatten = FALSE)
 }
 \arguments{
 \item{input}{One or more paths to saved `.html` files, **a folder** (every
@@ -12,6 +12,11 @@ scholar_parse_html(input, recursive = FALSE)
 from several pages are combined.}
 
 \item{recursive}{If `input` is a folder, also read files in its subfolders.}
+
+\item{flatten}{If `TRUE`, `author_list` is returned as text, with the authors
+of each result joined by `"; "`, instead of as a list column. Use this
+before saving the result with [utils::write.csv()] or
+`writexl::write_xlsx()`. Default `FALSE`.}
 }
 \value{
 A data frame with one row per result: `source_file` (the file it came
@@ -19,6 +24,11 @@ A data frame with one row per result: `source_file` (the file it came
   with initials), `author_list` (a list column of names), `authors_truncated`,
   `venue`, `venue_truncated`, `year`, `publisher`, `url`, `snippet`,
   `cited_by`, `versions` and `cid` (Scholar's internal id for the result).
+
+  `author_list` is a list column unless you use `flatten = TRUE`. List
+  columns are not quoted by [utils::write.csv()], so the commas inside names
+  shift the other columns sideways in the saved file. Use `flatten = TRUE` if
+  you plan to save the result.
 }
 \description{
 Reads a Google Scholar search-results page that you saved from your browser
@@ -44,4 +54,5 @@ page <- '<div class="gs_r" data-cid="x1"><div class="gs_ri">
   <div class="gs_a">A Smith, B Jones - Journal of Examples, 2019 - Example Press</div>
   <div class="gs_fl"><a>Cite</a> <a>Cited by 12</a></div></div></div>'
 scholar_parse_html(page)
+scholar_parse_html(page, flatten = TRUE)$author_list
 }

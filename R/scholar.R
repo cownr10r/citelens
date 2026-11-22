@@ -105,19 +105,29 @@
 #'   `.html` / `.htm` file in it is read), or a string of HTML text. Results
 #'   from several pages are combined.
 #' @param recursive If `input` is a folder, also read files in its subfolders.
+#' @param flatten If `TRUE`, `author_list` is returned as text, with the authors
+#'   of each result joined by `"; "`, instead of as a list column. Use this
+#'   before saving the result with [utils::write.csv()] or
+#'   `writexl::write_xlsx()`. Default `FALSE`.
 #' @return A data frame with one row per result: `source_file` (the file it came
 #'   from), `title`, `authors` (as shown,
 #'   with initials), `author_list` (a list column of names), `authors_truncated`,
 #'   `venue`, `venue_truncated`, `year`, `publisher`, `url`, `snippet`,
 #'   `cited_by`, `versions` and `cid` (Scholar's internal id for the result).
+#'
+#'   `author_list` is a list column unless you use `flatten = TRUE`. List
+#'   columns are not quoted by [utils::write.csv()], so the commas inside names
+#'   shift the other columns sideways in the saved file. Use `flatten = TRUE` if
+#'   you plan to save the result.
 #' @examples
 #' page <- '<div class="gs_r" data-cid="x1"><div class="gs_ri">
 #'   <h3 class="gs_rt"><a href="https://example.org/a">Retention and <b>advising</b></a></h3>
 #'   <div class="gs_a">A Smith, B Jones - Journal of Examples, 2019 - Example Press</div>
 #'   <div class="gs_fl"><a>Cite</a> <a>Cited by 12</a></div></div></div>'
 #' scholar_parse_html(page)
+#' scholar_parse_html(page, flatten = TRUE)$author_list
 #' @export
-scholar_parse_html <- function(input, recursive = FALSE) {
+scholar_parse_html <- function(input, recursive = FALSE, flatten = FALSE) {
   input <- .expand_html_inputs(input, recursive)
   if (length(input) > 1) {
     empty <- character()
@@ -146,9 +156,17 @@ scholar_parse_html <- function(input, recursive = FALSE) {
     }
     message("Read ", length(input), " file(s): ", nrow(out), " result(s).")
     rownames(out) <- NULL
-    return(out)
+  } else {
+    out <- .parse_scholar_one(input)
   }
-  .parse_scholar_one(input)
+  if (isTRUE(flatten)) {
+    # one text value per cell, so the result can be saved with write.csv() etc.
+    out$author_list <- vapply(unclass(out$author_list), function(a) {
+      a <- a[!is.na(a)]
+      if (length(a)) paste(a, collapse = "; ") else NA_character_
+    }, character(1))
+  }
+  out
 }
 
 # Turn folders into the .html files inside them; leave file paths and HTML text alone.

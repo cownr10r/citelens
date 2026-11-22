@@ -126,3 +126,33 @@ test_that("subfolders are only read when asked; empty folders error clearly", {
   e <- tempfile("empty"); dir.create(e)
   expect_error(scholar_parse_html(e), "No .html files found")
 })
+
+test_that("flatten = TRUE returns author_list as text that survives a CSV round trip", {
+  r  <- scholar_parse_html(gs_page())
+  rf <- scholar_parse_html(gs_page(), flatten = TRUE)
+  expect_true(is.list(r$author_list))                       # default is unchanged
+  expect_type(rf$author_list, "character")
+  expect_equal(rf$author_list[3], "Noble, K.; Flynn, N. T.; Lee, J. D.")
+  expect_equal(nrow(rf), nrow(r))
+  expect_equal(names(rf), names(r))
+  f <- tempfile(fileext = ".csv")
+  on.exit(unlink(f))
+  write.csv(rf, f, row.names = FALSE)
+  back <- read.csv(f, stringsAsFactors = FALSE)
+  expect_equal(ncol(back), ncol(rf))
+  expect_equal(back$year, rf$year)
+  expect_equal(back$author_list, rf$author_list)
+})
+
+test_that("flatten = TRUE also works for several files and for empty results", {
+  d <- tempfile("pages"); dir.create(d)
+  on.exit(unlink(d, recursive = TRUE))
+  writeLines(gs_page(), file.path(d, "a.html"))
+  writeLines(gs_page(), file.path(d, "b.html"))
+  r <- suppressMessages(scholar_parse_html(d, flatten = TRUE))
+  expect_type(r$author_list, "character")
+  expect_equal(nrow(r), 10)
+  e <- suppressWarnings(scholar_parse_html("<html><body></body></html>", flatten = TRUE))
+  expect_equal(nrow(e), 0)
+  expect_type(e$author_list, "character")
+})
