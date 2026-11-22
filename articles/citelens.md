@@ -109,7 +109,7 @@ an output path:
 
 bib_file <- tempfile(fileext = ".bib")
 convert_refworks(ris, bib_file)
-#> Converted 4 record(s) -> /tmp/RtmpQ2h6QC/file1b7e5afcaf02.bib
+#> Converted 4 record(s) -> /tmp/RtmplvTYg6/file1c545dbbf75.bib
 file.exists(bib_file)
 #> [1] TRUE
 ```
@@ -124,8 +124,8 @@ does the whole job in one step. It can also keep the BibTeX copy.
 
 xlsx_file <- tempfile(fileext = ".xlsx")
 refs <- refworks_to_xlsx(ris, xlsx_file, bib = tempfile(fileext = ".bib"))
-#> Converted 4 record(s) -> /tmp/RtmpQ2h6QC/file1b7e6ba79654.bib
-#> Wrote 4 entries to /tmp/RtmpQ2h6QC/file1b7e28c2942e.xlsx
+#> Converted 4 record(s) -> /tmp/RtmplvTYg6/file1c541fd0c482.bib
+#> Wrote 4 entries to /tmp/RtmplvTYg6/file1c5417c067fd.xlsx
 file.exists(xlsx_file)
 #> [1] TRUE
 ```
@@ -608,7 +608,7 @@ sessionInfo()
 #> [17] rmarkdown_2.32     grid_4.6.2         evaluate_1.0.5     jquerylib_0.1.4   
 #> [21] fastmap_1.2.0      yaml_2.3.12        lifecycle_1.0.5    compiler_4.6.2    
 #> [25] RColorBrewer_1.1-3 fs_2.1.0           Rcpp_1.1.2         farver_2.1.2      
-#> [29] systemfonts_1.3.3  digest_0.6.39      R6_2.6.1           bslib_0.12.0      
+#> [29] systemfonts_1.3.4  digest_0.6.39      R6_2.6.1           bslib_0.12.0      
 #> [33] withr_3.0.3        gtable_0.3.6       tools_4.6.2        pkgdown_2.2.1     
 #> [37] ggplot2_4.0.4      cachem_1.1.0       desc_1.4.3
 ```

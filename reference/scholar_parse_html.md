@@ -10,7 +10,7 @@ requests and whose terms do not allow them.
 ## Usage
 
 ``` r
-scholar_parse_html(input, recursive = FALSE)
+scholar_parse_html(input, recursive = FALSE, flatten = FALSE)
 ```
 
 ## Arguments
@@ -25,6 +25,13 @@ scholar_parse_html(input, recursive = FALSE)
 
   If \`input\` is a folder, also read files in its subfolders.
 
+- flatten:
+
+  If \`TRUE\`, \`author_list\` is returned as text, with the authors of
+  each result joined by \`"; "\`, instead of as a list column. Use this
+  before saving the result with \[utils::write.csv()\] or
+  \`writexl::write_xlsx()\`. Default \`FALSE\`.
+
 ## Value
 
 A data frame with one row per result: \`source_file\` (the file it came
@@ -33,6 +40,11 @@ from), \`title\`, \`authors\` (as shown, with initials), \`author_list\`
 \`venue_truncated\`, \`year\`, \`publisher\`, \`url\`, \`snippet\`,
 \`cited_by\`, \`versions\` and \`cid\` (Scholar's internal id for the
 result).
+
+\`author_list\` is a list column unless you use \`flatten = TRUE\`. List
+columns are not quoted by \[utils::write.csv()\], so the commas inside
+names shift the other columns sideways in the saved file. Use \`flatten
+= TRUE\` if you plan to save the result.
 
 ## Details
 
@@ -60,4 +72,6 @@ scholar_parse_html(page)
 #> 1             FALSE Journal of Examples           FALSE 2019 Example Press
 #>                     url snippet cited_by versions cid
 #> 1 https://example.org/a    <NA>       12       NA  x1
+scholar_parse_html(page, flatten = TRUE)$author_list
+#> [1] "Smith, A.; Jones, B."
 ```

@@ -59,7 +59,7 @@ them.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">scholar_parse_html</span><span class="op">(</span><span class="va">input</span>, recursive <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">scholar_parse_html</span><span class="op">(</span><span class="va">input</span>, recursive <span class="op">=</span> <span class="cn">FALSE</span>, flatten <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -75,6 +75,13 @@ from several pages are combined.</p></dd>
 <dt id="arg-recursive">recursive<a class="anchor" aria-label="anchor" href="#arg-recursive"></a></dt>
 <dd><p>If `input` is a folder, also read files in its subfolders.</p></dd>
 
+
+<dt id="arg-flatten">flatten<a class="anchor" aria-label="anchor" href="#arg-flatten"></a></dt>
+<dd><p>If `TRUE`, `author_list` is returned as text, with the authors
+of each result joined by `"; "`, instead of as a list column. Use this
+before saving the result with [utils::write.csv()] or
+`writexl::write_xlsx()`. Default `FALSE`.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -83,6 +90,10 @@ from several pages are combined.</p></dd>
   with initials), `author_list` (a list column of names), `authors_truncated`,
   `venue`, `venue_truncated`, `year`, `publisher`, `url`, `snippet`,
   `cited_by`, `versions` and `cid` (Scholar's internal id for the result).</p>
+<p>`author_list` is a list column unless you use `flatten = TRUE`. List
+  columns are not quoted by [utils::write.csv()], so the commas inside names
+  shift the other columns sideways in the saved file. Use `flatten = TRUE` if
+  you plan to save the result.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -108,6 +119,8 @@ does not show volume, pages or DOI. Entries affected are flagged in
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1             FALSE Journal of Examples           FALSE 2019 Example Press</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                     url snippet cited_by versions cid</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 https://example.org/a    &lt;NA&gt;       12       NA  x1</span>
+<span class="r-in"><span><span class="fu">scholar_parse_html</span><span class="op">(</span><span class="va">page</span>, flatten <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">$</span><span class="va">author_list</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Smith, A.; Jones, B."</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
