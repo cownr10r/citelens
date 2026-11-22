@@ -2,6 +2,10 @@
 
 ## New functions
 
+* `scholar_parse_html()` gains `flatten = TRUE`, which returns `author_list`
+  as text so results can be saved safely with `write.csv()` or
+  `writexl::write_xlsx()`.
+
 * `abstract_ca()` runs correspondence analysis on the terms in abstracts,
   comparing groups such as periods, venues or sources. It comes with `plot()`
   and `print()` methods.
